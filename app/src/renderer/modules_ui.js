@@ -296,7 +296,7 @@ const __fieldBrowseBtns = new Map();
       wrapper.appendChild(input);
 
       // パス系入力（例: dataDir / dataPath）はフォルダ選択ボタンを付ける
-      // ※ nodeIntegration=true の前提で ipcRenderer を直接呼ぶ（現状仕様に合わせる）
+      // OS 操作は用途を限定した preload API を経由する
       const isDirField = field.isDir === true || field.name === "dataDir" || field.name === "dataPath" || field.name === "dataStorePath";
       if (isDirField) {
         const btn = document.createElement("button");
@@ -306,10 +306,7 @@ const __fieldBrowseBtns = new Map();
 
         btn.addEventListener("click", async () => {
           try {
-            const { ipcRenderer } = window.require("electron");
-            const result = await ipcRenderer.invoke("dialog:openDirectory", {
-              title: "フォルダを選択",
-            });
+            const result = await window.electronAPI.pickDirectory("フォルダを選択");
             if (result && !result.canceled && result.path) {
               // Windows の \ を / に統一（既存生成処理と合わせる）
               input.value = String(result.path).replace(/\\/g, "/");

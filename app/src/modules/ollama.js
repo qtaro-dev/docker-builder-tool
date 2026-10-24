@@ -20,16 +20,13 @@ registerModule({
       max: 65535,
       isPort: true,
       protocol: "tcp",
-      visibleWhen: { field: "dataStoreType", equals: "bind" },
-      isDir: true,
-      browseEnabledWhen: { field: "dataStoreType", equals: "bind" },
-      placeholder: "./ollama-data",
+      placeholder: "11434",
     },
     {
   name: "dataStoreType",
   label: "データ保存方式",
   type: "select",
-  default: "./ollama-data",
+  default: "named",
   options: [
     { value: "named", label: "名前付きボリューム（推奨）" },
     { value: "bind", label: "バインドマウント（ホストパス）" },
@@ -49,6 +46,9 @@ registerModule({
       type: "text",
       default: "./ollama-data",
       placeholder: "./ollama-data",
+      visibleWhen: { field: "dataStoreType", equals: "bind" },
+      isDir: true,
+      browseEnabledWhen: { field: "dataStoreType", equals: "bind" },
     },
     {
       name: "models",
@@ -70,10 +70,6 @@ registerModule({
         ? "udp"
         : "tcp";
 
-    const dataPathRaw =
-      (config.dataPath || "./ollama-data").toString();
-    const dataPath = dataPathRaw.replace(/\\/g, "/");
-
     const svcName = `${projectName}-ollama`;
 
     const portMapping =
@@ -91,7 +87,11 @@ registerModule({
     if (models.length > 0) {
       const scriptLines = [
         "ollama serve & sleep 5",
-        ...models.map((m) => `ollama pull ${m}`),
+        ...models.map((m) => {
+          if (m.startsWith("-")) throw new Error("モデル名をオプションとして指定することはできません。");
+          // Model names are data, never shell syntax inside the generated script.
+          return `ollama pull '${m.replace(/'/g, "'\\''")}'`;
+        }),
         "tail -f /dev/null",
       ];
       command = ["sh", "-c", scriptLines.join(" && ")];
@@ -99,7 +99,12 @@ registerModule({
       command = ["ollama", "serve"];
     }
 
-        if (storeType === "bind") {
+    const storeType = String(config.dataStoreType || "named");
+    const storeName = String(config.dataStoreName || "").trim();
+    const storePath = String(config.dataStorePath || "./ollama-data").trim().replace(/\\/g, "/");
+    const volumes = [];
+    const namedVolumes = [];
+    if (storeType === "bind") {
       volumes.push(`${storePath}:/root/.ollama`);
     } else {
       const key = (storeName || "ollama-data").replace(/[^\w.-]/g, "-");
@@ -119,7 +124,7 @@ const service = {
 
     return {
       services: [service],
-      volumes: [],
+      volumes: namedVolumes,
     };
   },
 
