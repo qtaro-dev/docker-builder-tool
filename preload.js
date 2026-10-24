@@ -1,14 +1,18 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  // 既存の API …
-  // onOpenAboutDialog: (handler) => ipcRenderer.on('open-about-dialog', handler),
-
-  writeLog: async (message) => {
-    try {
-      await ipcRenderer.invoke('write-log', message);
-    } catch (e) {
-      console.error('writeLog failed', e);
-    }
-  }
+// Never expose raw IPC, Electron events, or filesystem access to the page.
+contextBridge.exposeInMainWorld("electronAPI", {
+  getVersion: () => ipcRenderer.invoke("get-app-version"),
+  getSettings: () => ipcRenderer.invoke("settings:get"),
+  saveSettings: (settings) => ipcRenderer.invoke("settings:save", settings),
+  getSettingsPath: () => ipcRenderer.invoke("settings:path"),
+  isDirectory: (path) => ipcRenderer.invoke("directory:check", path),
+  pickDirectory: (title) => ipcRenderer.invoke("dialog:openDirectory", { title }),
+  writeLog: (message) => ipcRenderer.invoke("write-log", message),
+  saveGeneratedFile: (filename, content) => ipcRenderer.invoke("file:saveGenerated", filename, content),
+  onMenuCommand: (handler) => {
+    const listener = (_event, command) => handler(command);
+    ipcRenderer.on("menu-command", listener);
+    return () => ipcRenderer.removeListener("menu-command", listener);
+  },
 });

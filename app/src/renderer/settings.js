@@ -9,11 +9,11 @@
 // [S01] 設定の初期読み込み（起動時）
 // ==============================
 async function applyInitialSettings() {
-  const ipcRenderer = window.__rendererCore?.ipcRenderer || null;
-  if (!ipcRenderer || typeof ipcRenderer.invoke !== "function") return;
+  const api = window.electronAPI;
+  if (!api) return;
 
   try {
-    const settings = await ipcRenderer.invoke("settings:get");
+    const settings = await api.getSettings();
 
     // テーマ反映
     if (settings && settings.theme) {
@@ -79,15 +79,10 @@ async function applyInitialSettings() {
 // ==============================
 // [S02] パス検証・ヒント表示ユーティリティ
 // ==============================
-function isValidDirectoryPath(p) {
-  const fs = window.__rendererCore?.fs || null;
-  if (!p || !fs) return false;
-  try {
-    if (!fs.existsSync(p)) return false;
-    return fs.statSync(p).isDirectory();
-  } catch {
-    return false;
-  }
+async function isValidDirectoryPath(p) {
+  if (!p || !window.electronAPI) return false;
+  try { return await window.electronAPI.isDirectory(p); }
+  catch { return false; }
 }
 
 function setHint(id, text, isError) {
@@ -103,12 +98,12 @@ function setHint(id, text, isError) {
 // [S03] ネイティブフォルダ選択（フォールバック無し）
 // ==============================
 async function pickDirectoryViaNativeDialog(title) {
-  const ipcRenderer = window.__rendererCore?.ipcRenderer || null;
-  if (!ipcRenderer || typeof ipcRenderer.invoke !== "function") return null;
+  const api = window.electronAPI;
+  if (!api) return null;
 
   try {
     // main.js 側の dialog:openDirectory を使う（ネイティブな「フォルダ選択」）
-    const result = await ipcRenderer.invoke("dialog:openDirectory", { title });
+    const result = await api.pickDirectory(title);
 
     // 互換：以前の実装が「文字列」を返すパターンにも対応
     if (typeof result === "string") {
@@ -172,7 +167,9 @@ function setupFolderPickers() {
 
         if (input) input.value = dir;
 
-        if (!isValidDirectoryPath(dir)) {
+        const valid = await isValidDirectoryPath(dir);
+        if (input && input.value.trim() !== dir) return;
+        if (!valid) {
           setHint(m.hintId, "そのパスは無効です。", true);
         } else {
           setHint(m.hintId, "", false);
@@ -182,13 +179,15 @@ function setupFolderPickers() {
 
     // --- 手入力：入力のたびに検証（存在しない場合は無効表示） ---
     if (input) {
-      input.addEventListener("input", () => {
+      input.addEventListener("input", async () => {
         const v = input.value.trim();
         if (!v) {
           setHint(m.hintId, "", false);
           return;
         }
-        if (!isValidDirectoryPath(v)) {
+        const valid = await isValidDirectoryPath(v);
+        if (input.value.trim() !== v) return;
+        if (!valid) {
           setHint(m.hintId, "そのパスは無効です。", true);
         } else {
           setHint(m.hintId, "", false);
@@ -222,7 +221,7 @@ function setupSettingsNavigation() {
 // [S05] 設定保存（dialog→settings:save）
 // ==============================
 async function saveSettingsFromDialog() {
-  const ipcRenderer = window.__rendererCore?.ipcRenderer || null;
+  const api = window.electronAPI;
 
   const sProj = document.getElementById("settingsDefaultProject");
   const sTheme = document.getElementById("settingsTheme");
@@ -236,13 +235,13 @@ async function saveSettingsFromDialog() {
   const paths = {};
 
   if (projectRoot)
-    isValidDirectoryPath(projectRoot) ? (paths.projectRoot = projectRoot) : invalids.push("projectRoot");
+    await isValidDirectoryPath(projectRoot) ? (paths.projectRoot = projectRoot) : invalids.push("projectRoot");
   if (composeDir)
-    isValidDirectoryPath(composeDir) ? (paths.composeDir = composeDir) : invalids.push("composeDir");
+    await isValidDirectoryPath(composeDir) ? (paths.composeDir = composeDir) : invalids.push("composeDir");
   if (dockerfileDir)
-    isValidDirectoryPath(dockerfileDir) ? (paths.dockerfileDir = dockerfileDir) : invalids.push("dockerfileDir");
+    await isValidDirectoryPath(dockerfileDir) ? (paths.dockerfileDir = dockerfileDir) : invalids.push("dockerfileDir");
   if (logDir)
-    isValidDirectoryPath(logDir) ? (paths.logDir = logDir) : invalids.push("logDir");
+    await isValidDirectoryPath(logDir) ? (paths.logDir = logDir) : invalids.push("logDir");
 
   // invalid のヒント表示
   if (invalids.includes("projectRoot")) setHint("settingsProjectRootHint", "そのパスは無効です。", true);
@@ -258,9 +257,9 @@ async function saveSettingsFromDialog() {
     paths,
   };
 
-  if (!ipcRenderer || typeof ipcRenderer.invoke !== "function") return { ok: false };
+  if (!api) return { ok: false };
 
-  const saved = await ipcRenderer.invoke("settings:save", newSettings);
+  const saved = await api.saveSettings(newSettings);
 
   // 即時反映：プロジェクト名
   const pn = document.getElementById("projectNameInput");

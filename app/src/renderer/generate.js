@@ -9,39 +9,42 @@
 // [G01] docker-compose.yml 生成ヘルパー
 // ==============================
 function renderComposeYaml(model) {
+  // JSON strings/arrays are valid YAML flow values. Quoting prevents newlines,
+  // comments and YAML metacharacters in user input from adding configuration.
+  const scalar = (value) => JSON.stringify(String(value));
   const lines = [];
   lines.push('version: "3.9"');
   lines.push("services:");
 
   model.services.forEach((svc) => {
-    lines.push(`  ${svc.name}:`);
-    lines.push(`    image: ${svc.image}`);
-    if (svc.restart) lines.push(`    restart: ${svc.restart}`);
+    lines.push(`  ${scalar(svc.name)}:`);
+    lines.push(`    image: ${scalar(svc.image)}`);
+    if (svc.restart) lines.push(`    restart: ${scalar(svc.restart)}`);
 
     if (svc.ports && svc.ports.length > 0) {
       lines.push("    ports:");
-      svc.ports.forEach((p) => lines.push(`      - "${p}"`));
+      svc.ports.forEach((p) => lines.push(`      - ${scalar(p)}`));
     }
     if (svc.volumes && svc.volumes.length > 0) {
       lines.push("    volumes:");
-      svc.volumes.forEach((v) => lines.push(`      - ${v}`));
+      svc.volumes.forEach((v) => lines.push(`      - ${scalar(v)}`));
     }
     if (svc.environment && Object.keys(svc.environment).length > 0) {
       lines.push("    environment:");
       Object.entries(svc.environment).forEach(([k, v]) => {
-        lines.push(`      - ${k}=${v}`);
+        lines.push(`      - ${scalar(`${k}=${v}`)}`);
       });
     }
     if (svc.depends_on && svc.depends_on.length > 0) {
       lines.push("    depends_on:");
-      svc.depends_on.forEach((d) => lines.push(`      - ${d}`));
+      svc.depends_on.forEach((d) => lines.push(`      - ${scalar(d)}`));
     }
-    if (svc.command) lines.push(`    command: ${svc.command}`);
+    if (svc.command) lines.push(`    command: ${Array.isArray(svc.command) ? JSON.stringify(svc.command.map(String)) : scalar(svc.command)}`);
   });
 
   if (model.volumes.size > 0) {
     lines.push("volumes:");
-    Array.from(model.volumes).forEach((v) => lines.push(`  ${v}:`));
+    Array.from(model.volumes).forEach((v) => lines.push(`  ${scalar(v)}:`));
   }
 
   return lines.join("\n");
@@ -73,7 +76,7 @@ async function generateConfigs() {
 
   const msg = document.getElementById("portMessage");
   if (msg) {
-    msg.innerHTML = "";
+    msg.textContent = "";
     msg.className = "generate-message";
   }
 
@@ -94,7 +97,7 @@ async function generateConfigs() {
   // モジュール未選択時
   if (activeModules.length === 0) {
     if (msg) {
-      msg.innerHTML = "モジュールが選択されていません。";
+      msg.textContent = "モジュールが選択されていません。";
       msg.classList.add("port-message-error");
     }
     return;
@@ -108,7 +111,7 @@ async function generateConfigs() {
     const cfg = {};
 
     (mod.fields || []).forEach((field) => {
-      const input = section.querySelector(`[data-field-name="${field.name}"]`);
+      const input = section.querySelector(`input[data-field-name="${field.name}"], select[data-field-name="${field.name}"]`);
       if (!input) return;
 
       let value = input.value ?? "";
@@ -218,7 +221,7 @@ async function generateConfigs() {
   // 入力系のエラーがある場合はここで終了
   if (validationErrors.length > 0) {
     if (msg) {
-      msg.innerHTML = validationErrors.concat(warnings).join("<br>");
+      msg.textContent = validationErrors.concat(warnings).join("\n");
       msg.classList.add("port-message-error");
     }
     return;
@@ -307,7 +310,7 @@ async function generateConfigs() {
       msg.classList.add("port-message-ok");
     }
 
-    msg.innerHTML = messages.join("<br>");
+    msg.textContent = messages.join("\n");
   }
 
   // ---- ログ出力（最後にサマリーを書き出し）----

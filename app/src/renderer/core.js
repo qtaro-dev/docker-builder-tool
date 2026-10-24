@@ -6,26 +6,7 @@
 // ==============================
 // [C01] Electron IPC
 // ==============================
-let ipcRenderer = null;
-try {
-  ipcRenderer = require("electron").ipcRenderer;
-} catch (e) {
-  // ブラウザ単体で動かす場合などはここに来る
-}
-// [C01] END
-
-// ==============================
-// [C02] Node.js FS/Path（設定パス検証・フォルダ選択に使用）
-// ==============================
-let fs = null;
-let pathMod = null;
-try {
-  fs = require("fs");
-  pathMod = require("path");
-} catch (e) {
-  // nodeIntegration が無い場合など
-}
-// [C02] END
+const api = window.electronAPI;
 
 // ==============================
 // [C03] ログ出力ユーティリティ
@@ -33,16 +14,8 @@ try {
 async function appendLog(message) {
   const line = `[renderer] ${message}`;
   try {
-    if (ipcRenderer && typeof ipcRenderer.invoke === "function") {
-      await ipcRenderer.invoke("write-log", line);
-    } else if (
-      window.electronAPI &&
-      typeof window.electronAPI.writeLog === "function"
-    ) {
-      window.electronAPI.writeLog(line);
-    } else {
-      console.log(line);
-    }
+    if (api) await api.writeLog(line);
+    else console.log(line);
   } catch (err) {
     console.error("ログ書き込みに失敗しました:", err);
   }
@@ -72,9 +45,7 @@ function getCurrentProjectName() {
  * 既存コードの呼び出し構造を崩さないため、window に公開します。
  */
 window.__rendererCore = {
-  ipcRenderer,
-  fs,
-  pathMod,
+  api,
   appendLog,
   sanitizeName,
   getCurrentProjectName,

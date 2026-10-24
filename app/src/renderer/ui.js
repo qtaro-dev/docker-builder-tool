@@ -112,7 +112,7 @@ function setupTabs() {
 // [U02] テーマ切り替え
 // ==============================
 function setupThemeToggle() {
-  const ipcRenderer = window.__rendererCore?.ipcRenderer || null;
+  const api = window.electronAPI;
 
   const btn = document.getElementById("themeToggleButton");
   if (!btn) return;
@@ -146,24 +146,8 @@ function setupThemeToggle() {
 
   // 保存（await を使うので async にする）
   const saveTheme = async () => {
-    // electronAPI があるならそれを優先
-    if (window.electronAPI?.invoke) {
-      try {
-        await window.electronAPI.invoke("settings:save", { theme: current });
-        return;
-      } catch (err) {
-        console.error("テーマ設定の保存に失敗(electronAPI):", err);
-      }
-    }
-
-    // フォールバック：ipcRenderer がある場合
-    if (ipcRenderer && typeof ipcRenderer.invoke === "function") {
-      try {
-        await ipcRenderer.invoke("settings:save", { theme: current });
-      } catch (err) {
-        console.error("テーマ設定の保存に失敗(ipcRenderer):", err);
-      }
-    }
+    try { await api?.saveSettings({ theme: current }); }
+    catch (err) { console.error("テーマ設定の保存に失敗:", err); }
   };
 
   // 初期表示
@@ -218,16 +202,13 @@ function setupResultButtons() {
 
     const dlBtn = document.getElementById(p.downloadId);
     if (dlBtn) {
-      dlBtn.addEventListener("click", () => {
-        const blob = new Blob([textarea.value || ""], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = p.filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+      dlBtn.addEventListener("click", async () => {
+        try {
+          await window.electronAPI.saveGeneratedFile(p.filename, textarea.value || "");
+        } catch (err) {
+          console.error("ファイルの保存に失敗:", err);
+          alert("ファイルの保存に失敗しました。保存先の権限や空き容量を確認してください。");
+        }
       });
     }
 
@@ -374,10 +355,10 @@ function resetConfiguration() {
 // [U08] メニューコマンド連携
 // ==============================
 function setupMenuIntegration() {
-  const ipcRenderer = window.__rendererCore?.ipcRenderer || null;
-  if (!ipcRenderer || typeof ipcRenderer.on !== "function") return;
+  const api = window.electronAPI;
+  if (!api) return;
 
-  ipcRenderer.on("menu-command", (_event, command) => {
+  api.onMenuCommand((command) => {
     switch (command) {
       case "file-new":
         resetConfiguration();
@@ -437,16 +418,16 @@ function updateAboutVersion() {
   const span = document.getElementById("aboutVersion");
   if (!span) return;
 
-  const ipcRenderer = window.__rendererCore?.ipcRenderer || null;
+  const api = window.electronAPI;
   // バージョン取得用 IPC レンダラー
-  if (!ipcRenderer || typeof ipcRenderer.invoke !== "function") {
+  if (!api) {
     span.textContent = "開発版";
     return;
   }
 
   // バージョン取得要求
-  ipcRenderer
-    .invoke("get-app-version")
+  api
+    .getVersion()
     .then((ver) => {
       span.textContent = ver;
     })

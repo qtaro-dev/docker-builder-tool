@@ -5,10 +5,18 @@ const { app, BrowserWindow, ipcMain, Menu, shell, dialog } = require("electron")
 const fs = require("fs");
 const path = require("path");
 
+const { entryURL, text, record, validateSettings, assertTrustedSender } = require("./security");
+
 let mainWindow;
+function handle(channel, callback) {
+  ipcMain.handle(channel, (event, ...args) => {
+    assertTrustedSender(event, mainWindow);
+    return callback(event, ...args);
+  });
+}
 
 // IPC: アプリバージョン取得
-ipcMain.handle("get-app-version", () => app.getVersion());
+handle("get-app-version", () => app.getVersion());
 
 // アプリ本体のあるフォルダ
 const appRootDir = app.isPackaged
@@ -43,11 +51,30 @@ function createWindow() {
     width: 1280,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true,
+      webviewTag: false,
       spellcheck: false,
     },
   });
+
+  const contents = mainWindow.webContents;
+  contents.setWindowOpenHandler(() => ({ action: "deny" }));
+  contents.on("will-navigate", (event) => event.preventDefault());
+  contents.on("will-redirect", (event) => event.preventDefault());
+  contents.on("will-attach-webview", (event) => event.preventDefault());
+  const allowClipboardWrite = (sender, permission, details) =>
+    sender === contents && sender.mainFrame.url === entryURL &&
+    permission === "clipboard-sanitized-write" && details.isMainFrame &&
+    details.requestingUrl === entryURL;
+  contents.session.setPermissionRequestHandler((sender, permission, callback, details) =>
+    callback(allowClipboardWrite(sender, permission, details)));
+  contents.session.setPermissionCheckHandler((sender, permission, _origin, details) =>
+    allowClipboardWrite(sender, permission, details));
+  contents.session.setDevicePermissionHandler(() => false);
 
   mainWindow.loadFile(path.join(__dirname, "app/index.html"));
 
@@ -168,9 +195,11 @@ function buildAppMenuTemplate() {
 // --------------------------------------
 // フォルダ選択ダイアログ（renderer から呼ぶ）
 // --------------------------------------
-ipcMain.handle("dialog:openDirectory", async (_event, options = {}) => {
-  const result = await dialog.showOpenDialog({
-    title: options.title || "フォルダを選択",
+handle("dialog:openDirectory", async (_event, options = {}) => {
+  record(options);
+  const title = options.title === undefined ? "フォルダを選択" : text(options.title, 256);
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title,
     properties: ["openDirectory"],
   });
 
@@ -223,7 +252,7 @@ function loadSettings() {
     if (fs.existsSync(settingsPath)) {
       return {
         ...defaultSettings,
-        ...JSON.parse(fs.readFileSync(settingsPath, "utf8")),
+        ...validateSettings(JSON.parse(fs.readFileSync(settingsPath, "utf8"))),
       };
     }
   } catch (err) {
@@ -237,29 +266,57 @@ function saveSettings(newSettings) {
   try {
     fs.writeFileSync(
       settingsPath,
-      JSON.stringify(newSettings, null, 2)
+      JSON.stringify(newSettings, null, 2),
+      "utf8"
     );
   } catch (err) {
     console.error("設定の保存に失敗:", err);
+    throw err;
   }
 }
 
 let currentSettings = loadSettings();
 
-ipcMain.handle("settings:path", () => settingsPath);
+handle("directory:check", async (_event, value) => {
+  const directory = text(value);
+  if (!directory) return false;
+  try { return (await fs.promises.stat(directory)).isDirectory(); }
+  catch { return false; }
+});
 
-ipcMain.handle("settings:get", () => currentSettings);
+// The renderer supplies content, never an arbitrary destination path. A native
+// save dialog gives the user control of the destination and overwrite consent.
+handle("file:saveGenerated", async (_event, filename, content) => {
+  if (!["docker-compose.yml", "Dockerfile"].includes(filename)) {
+    throw new TypeError("Invalid generated filename");
+  }
+  content = text(content, 2 * 1024 * 1024);
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: "生成ファイルを保存",
+    defaultPath: filename,
+    properties: ["showOverwriteConfirmation"],
+  });
+  if (result.canceled || !result.filePath) return { canceled: true };
+  await fs.promises.writeFile(result.filePath, content, "utf8");
+  return { canceled: false };
+});
 
-ipcMain.handle("settings:save", (_e, newSettings) => {
-  currentSettings = { ...currentSettings, ...newSettings };
-  saveSettings(currentSettings);
+handle("settings:path", () => settingsPath);
+
+handle("settings:get", () => currentSettings);
+
+handle("settings:save", (_e, newSettings) => {
+  const next = { ...currentSettings, ...validateSettings(newSettings) };
+  saveSettings(next);
+  currentSettings = next;
   return currentSettings;
 });
 
 // --------------------------------------
 // ログ書き込み
 // --------------------------------------
-ipcMain.handle("write-log", async (_event, message) => {
+handle("write-log", async (_event, message) => {
+  message = text(message, 16384).replace(/[\r\n]/g, " ");
   const now = new Date();
   const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
   const timestamp = jst
