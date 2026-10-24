@@ -35,7 +35,8 @@ require("./main");
   assert.equal(preferences.webSecurity, true);
   assert.deepEqual(await run('[typeof require, typeof process, typeof window.electronAPI.invoke]'),
     ["undefined", "undefined", "undefined"]);
-  await until('document.getElementById("aboutVersion").textContent === "0.2.1"');
+  const version = require("./package.json").version;
+  await until(`document.getElementById("aboutVersion").textContent === ${JSON.stringify(version)}`);
   console.log("PASS startup, 19 modules, isolation and version IPC");
 
   await run(`document.querySelector('[data-module-id="nginx"]').click();

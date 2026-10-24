@@ -1,20 +1,63 @@
 {
   "name": "docker-builder",
-  "version": "0.2.1",
-  "description": "",
+  "version": "0.2.2",
+  "description": "Electron desktop tool for generating Docker Compose configurations",
   "main": "main.js",
   "scripts": {
     "test": "node --test test/*.test.js",
     "start": "electron .",
-    "test:electron": "node test/run-electron.js"
+    "test:electron": "node test/run-electron.js",
+    "build:win": "electron-builder --win nsis --x64 --publish never",
+    "verify:package": "node scripts/verify-package.cjs"
   },
   "keywords": [],
-  "author": "",
+  "author": "qtaro-dev",
   "license": "ISC",
   "devDependencies": {
-    "electron": "45.0.0"
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0"
   },
   "engines": {
     "node": ">=22.12.0"
+  },
+  "build": {
+    "appId": "dev.qtaro.dockerbuilder",
+    "productName": "Docker Builder Tool",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "security.js",
+      "package.json",
+      "app/**/*",
+      "!**/*.log",
+      "!**/.env*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Docker.Builder.Tool.Setup.${version}.${arch}.${ext}",
+      "signAndEditExecutable": true,
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": false,
+      "packElevateHelper": false
+    },
+    "publish": null
   }
 }
