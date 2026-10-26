@@ -6,7 +6,9 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const electron = require("electron");
 const root = path.resolve(__dirname, "..");
-const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "docker-builder-test-"));
+// Windows runnerのTEMPは8.3短縮名を含む。Chromiumと同じ実パスから起動し、
+// アプリの厳密なIPC URL照合を変えずにテストする。
+const temporary = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), "docker-builder-test-")));
 try {
   for (const name of ["main.js", "preload.js", "security.js", "image-catalog.js", "package.json", "app"]) {
     fs.cpSync(path.join(root, name), path.join(temporary, name), { recursive: true });

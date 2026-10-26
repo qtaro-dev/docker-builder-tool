@@ -147,6 +147,13 @@ function run({ mode = 'generate-only', destination = artifacts(), invoke = docke
     try {
       const generated = generateCase(row.id, row.projectName);
       for (const file of writeCase(directory, generated)) exported.add(file);
+      // rootで動くPythonがbind先に作るキャッシュもrunnerが削除できるよう、
+      // CI所有の一時領域だけに親ディレクトリを用意する。配布生成物は変更しない。
+      if (mode === 'docker' && row.id === 'flask') {
+        const cache = path.join(directory, 'python-web', '__pycache__');
+        fs.mkdirSync(cache);
+        fs.chmodSync(cache, 0o777);
+      }
       verifyCase(directory, generated);
       fs.writeFileSync(path.join(directory, 'generation.log'), `PASS: ${row.modules.join(' + ')}\n${generated.model.warnings.join('\n')}\n`);
       row.generation = PASS;
