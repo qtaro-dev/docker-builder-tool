@@ -1,6 +1,6 @@
 # Docker構成生成：6パターンのUI操作・検証記録
 
-対象：v0.3.0-dev.0。確認日：2026-10-26。GitHub側の結果は後段の実行記録に追記する。
+対象：v0.3.0-dev.0。確認日：2026-10-26。GitHub側の結果は末尾の実行記録を参照。
 
 ## 確認方法とUI名称
 
@@ -60,7 +60,7 @@ nginx/
   fixture-web/index.html  [テスト追加：固定応答の静的コンテンツ]
 ```
 
-テスト追加ファイルのコピー元：`test/fixtures/web-validation/`、`node-validation/`、`flask-validation/`のうち、この構成に必要なものだけ。PostgreSQLはテスト用DB名/ユーザー/ダミーパスワードを入力し、実パスワードを使用しない。
+テスト追加：`test/fixtures/web-validation/index.html`を`fixture-web/index.html`へコピーする。固定HTTP応答の確認専用。
 
 生成Compose（UI自動操作・ヘッドレス生成で一致確認済み）：
 
@@ -78,7 +78,7 @@ services:
 
 ### GitHub Actionsでの検証結果
 
-初回実行前：未実施。実行URL、pull/build、起動、HTTP/DB、cleanup結果は末尾の実行記録へ追記する。
+[Ubuntu実行ジョブ](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584/job/121368492862)で生成・config・pull・起動・応答・cleanup成功。Dockerfileがあるケースはbuildも成功、ないケースは対象外。詳細は末尾の実行記録を参照。
 
 ## Apache単体
 
@@ -111,7 +111,7 @@ apache/
   fixture-web/index.html  [テスト追加：固定応答の静的コンテンツ]
 ```
 
-テスト追加ファイルのコピー元：`test/fixtures/web-validation/`、`node-validation/`、`flask-validation/`のうち、この構成に必要なものだけ。PostgreSQLはテスト用DB名/ユーザー/ダミーパスワードを入力し、実パスワードを使用しない。
+テスト追加：`test/fixtures/web-validation/index.html`を`fixture-web/index.html`へコピーする。固定HTTP応答の確認専用。
 
 生成Compose（UI自動操作・ヘッドレス生成で一致確認済み）：
 
@@ -129,7 +129,7 @@ services:
 
 ### GitHub Actionsでの検証結果
 
-初回実行前：未実施。実行URL、pull/build、起動、HTTP/DB、cleanup結果は末尾の実行記録へ追記する。
+[Ubuntu実行ジョブ](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584/job/121368492862)で生成・config・pull・起動・応答・cleanup成功。Dockerfileがあるケースはbuildも成功、ないケースは対象外。詳細は末尾の実行記録を参照。
 
 ## Node.js単体
 
@@ -167,7 +167,7 @@ nodejs/
   nodejs/server.cjs  [テスト追加：0.0.0.0:3000 HTTPサーバー]
 ```
 
-テスト追加ファイルのコピー元：`test/fixtures/web-validation/`、`node-validation/`、`flask-validation/`のうち、この構成に必要なものだけ。PostgreSQLはテスト用DB名/ユーザー/ダミーパスワードを入力し、実パスワードを使用しない。
+テスト追加：`test/fixtures/node-validation/`の`package.json`、`package-lock.json`、`server.cjs`を`nodejs/`へコピーする。依存なしのHTTP応答アプリであり、利用者のアプリを生成するものではない。
 
 生成Compose（UI自動操作・ヘッドレス生成で一致確認済み）：
 
@@ -217,7 +217,7 @@ coverage
 
 ### GitHub Actionsでの検証結果
 
-初回実行前：未実施。実行URL、pull/build、起動、HTTP/DB、cleanup結果は末尾の実行記録へ追記する。
+[Ubuntu実行ジョブ](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584/job/121368492862)で生成・config・pull・起動・応答・cleanup成功。Dockerfileがあるケースはbuildも成功、ないケースは対象外。詳細は末尾の実行記録を参照。
 
 ## Nginx＋Node.js
 
@@ -267,7 +267,7 @@ nginx-nodejs/
   nodejs/server.cjs  [テスト追加：0.0.0.0:3000 HTTPサーバー]
 ```
 
-テスト追加ファイルのコピー元：`test/fixtures/web-validation/`、`node-validation/`、`flask-validation/`のうち、この構成に必要なものだけ。PostgreSQLはテスト用DB名/ユーザー/ダミーパスワードを入力し、実パスワードを使用しない。
+テスト追加：`test/fixtures/web-validation/index.html`を`fixture-web/`へ、`test/fixtures/node-validation/`の`package.json`、`package-lock.json`、`server.cjs`を`nodejs/`へコピーする。両サービスを独立して確認する。
 
 生成Compose（UI自動操作・ヘッドレス生成で一致確認済み）：
 
@@ -324,7 +324,7 @@ coverage
 
 ### GitHub Actionsでの検証結果
 
-初回実行前：未実施。実行URL、pull/build、起動、HTTP/DB、cleanup結果は末尾の実行記録へ追記する。
+[Ubuntu実行ジョブ](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584/job/121368492862)で生成・config・pull・起動・応答・cleanup成功。Dockerfileがあるケースはbuildも成功、ないケースは対象外。詳細は末尾の実行記録を参照。
 
 ## Python Flask単体
 
@@ -362,7 +362,7 @@ flask/
   python-web/app.py  [テスト追加：Flask HTTPアプリ]
 ```
 
-テスト追加ファイルのコピー元：`test/fixtures/web-validation/`、`node-validation/`、`flask-validation/`のうち、この構成に必要なものだけ。PostgreSQLはテスト用DB名/ユーザー/ダミーパスワードを入力し、実パスワードを使用しない。
+テスト追加：`test/fixtures/flask-validation/`の`app.py`、`requirements.txt`を`python-web/`へコピーする。FlaskのHTTP応答用アプリと、ハッシュ固定したPython依存関係。CIでは削除権限を保つため、一時bindディレクトリにrunner所有の`__pycache__/`（0777）を先に作る。Compose・Dockerfileの内容は変更しない。この空ディレクトリは配布生成物/Artifactには含めない。
 
 生成Compose（UI自動操作・ヘッドレス生成で一致確認済み）：
 
@@ -415,7 +415,7 @@ __pycache__
 
 ### GitHub Actionsでの検証結果
 
-初回実行前：未実施。実行URL、pull/build、起動、HTTP/DB、cleanup結果は末尾の実行記録へ追記する。
+[Ubuntu実行ジョブ](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584/job/121368492862)で生成・config・pull・起動・応答・cleanup成功。Dockerfileがあるケースはbuildも成功、ないケースは対象外。詳細は末尾の実行記録を参照。
 
 ## PostgreSQL単体
 
@@ -450,7 +450,7 @@ postgres/
   docker-compose.yml
 ```
 
-テスト追加ファイルのコピー元：`test/fixtures/web-validation/`、`node-validation/`、`flask-validation/`のうち、この構成に必要なものだけ。PostgreSQLはテスト用DB名/ユーザー/ダミーパスワードを入力し、実パスワードを使用しない。
+テスト用の追加ファイルはない。DB名・ユーザー・パスワードは表のダミー値のみを使用する。CIはホストの`psql`から一時テーブルを作成し、19+23=42を確認してROLLBACKする。
 
 生成Compose（UI自動操作・ヘッドレス生成で一致確認済み）：
 
@@ -474,8 +474,33 @@ volumes:
 
 ### GitHub Actionsでの検証結果
 
-初回実行前：未実施。実行URL、pull/build、起動、HTTP/DB、cleanup結果は末尾の実行記録へ追記する。
+[Ubuntu実行ジョブ](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584/job/121368492862)で生成・config・pull・起動・応答・cleanup成功。Dockerfileがあるケースはbuildも成功、ないケースは対象外。詳細は末尾の実行記録を参照。
 
 ## 実機確認範囲
 
 6パターン全てで実Electron画面のタブ・選択行・既存入力・生成ボタン・生成結果切替を自動操作し、Composeと全Dockerfile/ignoreの一致、ローカル保存IPCの書込みを確認した。OS保存ダイアログの人手操作は未実施。手順のタブ名・項目名・非表示初期値はUIソースと実DOMを照合した。ローカルDocker起動は未実施。GitHub上の起動/応答確認は実行記録で別に報告する。
+
+## GitHub Actionsの実行記録（2026-10-26）
+
+開発ブランチ：`codex/appearance-theme-preview`。次の結果はmockではなく、GitHub-hosted Ubuntu 24.04の実Dockerで確認したもの。
+
+- [全ジョブ成功の実行3回目](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259471584)：対象コミット`1b1a356bfafb0e0cc710b84751502ea5b7ded10f`。Ubuntuの6構成とWindows実Electron回帰が全て成功。Windowsテストの通常画面は1280×900のコンテンツサイズを明示し、狭幅テストも従来どおり別に実施。
+- [実行2回目](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40259073969)：対象コミット`6473430aab1c4c89ad94f2c10c808fe61468d031`。Ubuntuジョブ成功。Windowsジョブは画面サイズ依存のレイアウトテストで失敗したため、実行全体を成功とは扱わない。
+- [初回](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40258471295)：Flaskのroot所有キャッシュによる一時ファイル削除エラー、Windowsの8.3短縮TEMPパスによるIPC URL不一致を検出。キャッシュ親をCI所有・削除可能な一時領域として事前作成し、Electronテスト起動先を実パスに正規化した。IPCの送信元検証やsandboxは変更していない。
+
+| 構成 | config | image pull | Dockerfile build | 起動 | 接続・応答 | down/volume削除 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Nginx | 成功 | 成功 | 対象外 | 成功 | HTTP 200・固定HTML | 成功 |
+| Apache | 成功 | 成功 | 対象外 | 成功 | HTTP 200・固定HTML | 成功 |
+| Node.js | 成功 | 成功 | 成功 | 成功 | HTTP 200・Node専用JSON | 成功 |
+| Nginx＋Node.js | 成功 | 成功 | Node成功 | 両方成功 | 両方の独立HTTP応答 | 成功 |
+| Python Flask | 成功 | 成功 | 成功 | 成功 | HTTP 200・Flask専用JSON | 成功 |
+| PostgreSQL | 成功 | 成功 | 対象外 | 成功 | ホストTCP認証・SQL合計42 | 成功 |
+
+生成物・fixture・`results.json`・各段階ログは成功した3回目の実行のArtifact `docker-validation-40259471584-1`に保存（保持7日）。Composeは生成後に一切書き換えず、CIだけの変更はprojectNameの固有値と、一時キャッシュ親ディレクトリの事前作成。
+
+### ローカル検証と未検証範囲
+
+`npm ci`成功、`npm test`35件成功、`npm run test:electron`成功（6構成の実UI操作・正確な生成物比較・保存IPCを含む）、`npm audit`0件。`npm run test:docker:generate`6構成の静的検証成功。ローカルのDockerコマンド分岐テストは模擬であり、上の実Docker結果とは別。
+
+OS保存ダイアログの人手操作、19モジュール全体、サービス間リバースプロキシ、本番アプリ、TLS/ACME、CVEスキャン、長時間運用は未検証。次の実動作対象候補はMySQL/MariaDB、Redis、WordPress、Laravel。Composeの`version`非推奨警告は残るが、構文・起動は成功している。
