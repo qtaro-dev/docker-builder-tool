@@ -128,11 +128,9 @@ const service = {
     };
   },
 
-  buildDockerfile(config = {}, shared = {}) {
-    return `
-FROM ollama/ollama
-
-# ここに追加の設定（プリセットモデル・設定ファイルなど）を追記できます。
-    `.trim();
+  buildDockerfile(config = {}) {
+    // FROMと依存インストールは共通生成処理に集約する。
+    if (!config.imageVersion) return "";
+    return window.ProjectGeneration.dockerfile("ollama", config, config.imageVersion, config.composerVersion);
   },
 });

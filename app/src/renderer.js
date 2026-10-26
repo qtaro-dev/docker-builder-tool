@@ -7,6 +7,13 @@
 // [R01] サブモジュール読み込み（順序が重要）
 // ==============================
 import "./renderer/core.js";        // Cxx: ipc/fs/log/utils
+import "./image-versions.js";
+import "./project-generation.js";
+import "./compose-serialization.js";
+import "./generation-guide.js";
+import "./renderer/image-ui.js";
+import "./renderer/generated-files.js";
+import "./renderer/generation-guide-ui.js";
 import "./renderer/modules_ui.js"; // Mxx: module registry & UI
 
 // --- モジュール定義読み込み（registerModule が必要なのでここが最適）---
@@ -70,6 +77,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       log("[R02] applyInitialSettings: not found");
     }
+
+    await window.ImageUI.initialize();
 
     // 2) UI起動（描画・イベント登録）※ここは必ず通したい
     const bootstrapApp = window.__rendererUI?.bootstrapApp || window.bootstrapApp;

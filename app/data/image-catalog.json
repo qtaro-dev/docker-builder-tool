@@ -1,0 +1,1232 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T00:22:56.029Z",
+  "entries": [
+    {
+      "slotId": "nodejs/24/bookworm-slim",
+      "tag": "24.22.1-bookworm-slim",
+      "digest": "sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:2dd9a4f758e173b65fee15388f7706af6fb01ef50cf7a2c0538711d67a6981ae"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:41a7d6337c4dfc9f286af709ad6551d931660f822c464e134f329a799a7f9cb9"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:294d33a992da016e059121deb0c979dffb4478b77a304376bca41393297c1ea2"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nodejs/24/alpine",
+      "tag": "24.22.1-alpine3.24",
+      "digest": "sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:1200d815de24f8dcca745fbf7651d166034a35adbcad8860a8538ffff44f1420"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:4b6703a274f040eb8f2697fa59137ace42fde04457d2e4253ea851a06f4b68fe"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:398bcf38afb035ae76feb9ad3c7493a93feff4751351c65310811761e37bbfc7"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nodejs/22/bookworm-slim",
+      "tag": "22.23.4-bookworm-slim",
+      "digest": "sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:ea11b74b986d520137cdef9a5346e447a00f275ecc4abc0055b7151226231e09"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:75c58d07c05cc37d937ca3f0038deb3caf3bbfaf423ac8818637ed5b9642d667"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:3ba69439667885bb087b138d1e0d7403cd6c3081089b67fdee46d3c76bfd67ac"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:ceb43e5c219139035fb742900629e4abed89fe0997f7c03250c499e1f2710c9e"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nodejs/22/alpine",
+      "tag": "22.23.4-alpine3.24",
+      "digest": "sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:025b8e975a61d94e33abeafaad1255ef44e4898cf1a1b6446860009c72e6d284"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:7e55a6e10f413328257558682acc65050dd78d55e0911bd8df049bbbcccba6a9"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:5f64b1b2cd9fdbe566f8fff839bf96f48f1c55cb471f85b789952c621caaebfa"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:fd4a97c1630a4a0a70117dd7b393e322db316d0489bdf36a0e776e7b235341b0"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nodejs/20/bookworm-slim",
+      "tag": "20.20.2-bookworm-slim",
+      "digest": "sha256:2cf067cfed83d5ea958367df9f966191a942351a2df77d6f0193e162b5febfc0",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:81fe7ed79dc8fac65bcc692f79836dd2e91775776cd45dacdd979cc219212da3"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:b90d50f1925df0d6695216ba0fcea1c211bf8ce278a762ea9726c8882f8d5fea"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:a5c7b0e67eabfca458e26ab8950dee727a72c25a1e3452b516172e145021557e"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:10fc5f5f33cba34a4befa58fcf95f724e67707fab7c32fb8cd3fcf90ebcc20df"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nodejs/20/alpine",
+      "tag": "20.20.2-alpine3.23",
+      "digest": "sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:afdf98210b07b586eb71fa22ba2e432e058e4cd1304d31ed60888755b8c865fb"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:bdc75b437061df9f89e23452a7ab2554b1f3b81d354b3f4cbb972c11674ac189"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:afa0a2a9265cc7b85d008ae15dbc9423ffd855c1cf4ce75b3ebec7412084749d"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:49d490a8c5216d5e9938193e39806088aa416231b3ccf0ed5ff037e6cbc91fb0"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:d63c387675b0ec5d7ef0c15b03691ac9f82803a8b30c87de3ce8a16960831cbc"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "python-web/3.14/slim-bookworm",
+      "tag": "3.14.9-slim-bookworm",
+      "digest": "sha256:945c2676dc2b18e0c1f16879244122c57c0ffede60006bf3df159c507a31bcae",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:7dff173021016c8829ae58d5ce112ffc388073ebe67f351aeb6ba2909e35f847"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:2878ba05852b7df1107f5d5611c0c4c077dc52d1d0ac1558fe2a07cb964ab7aa"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:442d8dae7081deef4db000b1aa9bbd442b0da9e02b387510b6de8ed1af8d5f28"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:1d4f0b54b07c247b93a6fc661e6c2770809e10a0ec7d27b86c0fb7a8cc6e9fb8"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:bfc44211421123c2c936e22404edef58325b96f184a968c375f5c58798e06c20"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "python-web/3.14/alpine3.22",
+      "tag": "3.14.5-alpine3.22",
+      "digest": "sha256:6b91e66ab2a880ce9ca5a1b91c70f45963ff71ff68268df056336e1a657d5efd",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:1a5f0303fd8941565b5bbda3fac2345148a9fd8245d575c2971ccefcd77c78f6"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:560e149014dd32d004e4e1c0a2ed01e22d74b031729c05fe9ebc001a76a28ce9"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:e41c383e828d51c335944485045b5291c4f4865a741d8313b2a01a525c45f787"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:1e3cfaa2078e932c3e88eaae24000b1e2971eeb5c1e2bb684a362d7d3d5da9e4"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:f9a909ac24499d909e062e17c97f1048fd781884dcd2183b4c5159543f0cd98d"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:27b691f87878a079100a3d8fafcd66b3c54d931598f307bcb54617c395f5b43c"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:bf19a0aa2c71cf516a645ec7ff40846de52b0e26489f7fca5051c754298391b0"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "python-web/3.13/slim-bookworm",
+      "tag": "3.13.17-slim-bookworm",
+      "digest": "sha256:e32be0e55814a08977501ca863271d9bd02443710db8f2afaf8372e2c4508530",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:4cea12ab7d78a3312c85f8cab19b6971d4fe9704da25443986c0bc20a6678850"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:c60419577ffab3a275113567743ff631add972b0d697bbd69f46d46de652de2c"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:0d15ae042443807cf6abb57bbaced96caba124f992805dd1e1df37fbd96c45ac"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:6c4a4593ec464d8eb577a7c48203ffac7c105b10ef9b4099b30a57f9c13f9b51"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:608b27b2db85abf38d81685085cd1166a5ed7ada66549f0dfe53a75bb830cd5d"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "python-web/3.13/alpine3.22",
+      "tag": "3.13.13-alpine3.22",
+      "digest": "sha256:e81548ac35b07a3bd4805f275107592ef458b1e893c0e04d45aedaa19416cca5",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:7f7ee17311e0273954ffe76a7b84a2d8c8ecf16f9992e780e4d46c86175df431"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:f23086311decd8fbdf7c65e82c7e21a3c013bcad9e0d4bdc36b75d672b5d5da2"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:719857ac6168ae3cae86a0f0bfe62ad9eaff65cd0e3a075a5cce73c4494d95d2"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:63c87417b046d17bd5e670f9ab7540aa04937f7edf2d178c76ea74f6552ddf28"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:29fb9f7447c214e698269b09a15f140bb4e2015c737dabc374ddf27194035c7c"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:a9b1e8cb5d25a3c62c0a248913331c9031fc0a45d97975aafe459d41bdfef36d"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:40d000b86a7c7c3b16d71bb76bba3753bda202f7fb4f988859ce6fac1ede32f9"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "python-web/3.12/slim-bookworm",
+      "tag": "3.12.15-slim-bookworm",
+      "digest": "sha256:6a0e06f5ba0b373d051aabd3fffb9b873f27f9a2a3a14bcbe37dee6f0e3bbc70",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:57d96f71de145a98e7ceca18ee4ade77bba4103a33a72dfaea026b23625c6bf0"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:ef3cfd1e01dc9f738a84191f3056a3807f598f8f5eef1d363575dbd6341fbd1f"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:e412733a6d102d73c087a335320a0f5746478410313b8306625c1f43d21fddc7"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:89eb16f50ad7578beefbf2b9e858c776d0169b42be835023b305e18a18083acc"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:c3729439afc4ec3f3e159e0c86aeabfadac8030ef46838a0256383d0511c5f5e"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "python-web/3.12/alpine3.22",
+      "tag": "3.12.13-alpine3.22",
+      "digest": "sha256:a190708a2dec1bd18b1decb539f8e8f5407abaa9bf39cacda583f7f8c11db322",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:9381e50cc82f4279b949fcd2d2f5e57cf97b1da2399eb956502364ceea2f4e83"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:8e9e90af3f7121abdd237eedb5b5db74f06100479aa05db8fe77a6743d432605"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:73f62a9993bea2dd04d0dbe622d134e34846d129e602201a7a5141eab5631bde"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:11c4adbe676b0793a6cb6e084995544a7e9f678b1b8498fe565bee8e4976d383"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:8616f0dcf0bae3f667eb04205839928139e929d999685a52159460da9b495cae"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:07b3a3b85d5b208f164a3276d5eb9c51e0ce61bbe4cb7ab4df0da50d5a78dc11"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:14573c43c891773b2937bf3b35f9bbf1feaaf81b27b45c8adf0d0476d6e44350"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nginx/1.30/debian",
+      "tag": "1.30.6-trixie",
+      "digest": "sha256:a7675fcee220f59b4a99f7098c06a0d5d999c2c0ee37c0211efb780536e5cb20",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:206f41196b946479a0fedeb1efd0598c31c45c248a6fa111430829efe94396f1"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:056c898338942a6049fe4b926881488a71baae285d1306a480f4a60a1b9e61f5"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:120eb1c12bfb67e3d38c4aabd4509bc27f5a96cd42abbcbd56f674a3869d66e5"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:b355602522234980363f8d5453077ba34609284675021e3c32af5c818fd8e43f"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:9e1f53a265ab11e532f1666f4ceecb8434a8cb567bd8c5a6cbd34d606fb2c53d"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:bc121281daabc29da94cc3ace96a4478424354d997c8003bdbc03bed22b4b752"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:1e8d4f38b150eac084ac98e58441184b25c32bc7b122e3111e71224b53a3cc61"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "nginx/1.30/alpine",
+      "tag": "1.30.6-alpine",
+      "digest": "sha256:47928bf67eb62a1863cb08d9ecb52d3e704304ba614eaee17884204677702951",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:84ed8c0dd296c188bfc24ed506f46589e9285fb0b11cf3a04d91d524d3067e11"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:86c2a67fd9e304703a1b70c7d586fda07b919800d0346f72d5effacbc41ed0ed"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:ea8a06e71f54644ec9473ad95bf1c6fb54f7974356a80249308425d651676e39"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:cd853e07f806cf254d195fc81a0ce14f024ea9e2065d083b85204ab1deaeace1"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:59ce6fc11b2f24a35c2d2f647e43e3621944b8c710b93c5f4d7846ee451086fe"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:4f7cab9e1cd018f80e67f31e02dc0c6d18560b19504461c4f3dd37e5c63a74c5"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:0ccee7e14271f8e76fbd169c1ad3471eddbf90f4072b6e6f52f665dddefb6fd4"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "apache/2.4/alpine",
+      "tag": "2.4.69-alpine",
+      "digest": "sha256:070da7661f0be8a05430b2c125c0cde9e53176b4048c813024021969a0e3893c",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:013ffcb0bf1a584c1939c6d7889ff5c68b8ea903e065fc10e4eb6da492767f77"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:5d487f5c0967b664fb2badc81c2fbb8a625898b3cf4fe3ef0fa869f8591068dd"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:d64b269001716653b23fa88f77163045023c7970c813aed79b387ca3ff7b05c5"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:2f87f38454ff5c0bc13f013a31b6f507a1d74f7e8c57488031bad0af04b0491e"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:21645a7a42d4d9ee8d80256ed63cc70e605b85d02c63af02bc5c2542c999800f"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:c2c54394095d209089eab270d3b5d61a8dd9e2c487b087c1bc6e26e7ff217758"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:616a77d0eb8575ec525bc29fc158a1cc9afb1b2468fb789e5947475280104e99"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "laravel/8.4/cli-bookworm",
+      "tag": "8.4.27-cli-bookworm",
+      "digest": "sha256:496b5e02fe9fe44fcfb715023b931048111dc4e0bc719789d83c906be9f04b05",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:a2d10c137d6ec9a41331e8e03e9d5468c85bfa8b1971436ffb2ad4f19d890e27"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:b1ad7c12dde0815be91bc54c692ff603db694dfe2e69e805344301a476c5ef5b"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:091cf7fe57d0c1f96ae39e0b85a7d0451c97b3cf92efd97d53077a9001f7f170"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:0cfa9c10e5054678a2e4018a5bea4c44bd9937e7269dd25cc0ff8e9736448c97"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:30af9613e4528b1c6cde04b966483766e80805d9218117b4e1ef9091d5632412"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "laravel/8.3/cli-bookworm",
+      "tag": "8.3.36-cli-bookworm",
+      "digest": "sha256:cdb77e306d6bb99db40e513fbe036ecc6c53b575cbcb7e581387845fef26d755",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:b6d03b662f216c9667bb51995671f8e644e2afb06db959b902be4bbd5ee22417"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:20d0813b6180eff53a56058e45eeb3b01940d14aaf21b031801108c82c7c71b4"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:c54e3cb45fee03881188297a73e41ad749310b9c40415b5de3687c435f7f675e"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:99b8d8b9ec4ab47dcad1e3742bb2318138e0b7ce85ccd8d6a5f678620390225f"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:df5f75cae26638b2ebd23e7d1a681b837a1f536d9fe611f5f30ae594a6af40a2"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "laravel/8.2/cli-bookworm",
+      "tag": "8.2.35-cli-bookworm",
+      "digest": "sha256:58bd7cb60b690c01106084ce4a0a73eb01094ceb00904ebb4b8514516765292a",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:f1e9f99de40ca245c2e773ed6ae4cc1e2715361c64b8bda639db2f747acd4bb8"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:3cc54b1cd2bd678351fea3e27bca8cfea7363cef55b56a308d6b08584f0f86c5"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:c6ff858f48b53ae8afcb1763465cac0512f8a75f43e3b267baabf9a8cc98340a"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:f3a8cf36e865b29392d56671780f319cfaf986b79927ece78a96a45e6bf179e9"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:c3ba44980b1650a1525ba9d1de039a0b55593e462e79be2012539ce52477bc27"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "composer/2/default",
+      "tag": "2.10.3",
+      "digest": "sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:66c00f4ea1c6a01364d75460bb2837886388e1d5b2b1b6e0f22c8788eb4e73ad"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:aefc4cfdb63b9bd3fbe2ea46e2324b067ff59591dc5b6c54661cc5088ba13d65"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:c32d4e5ed71b6812e0aea27c6e5952139359525c45b5407b862726c25d50ec01"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:8344bff2cc4287c8469b4a423c771e15b97f75e11119e4cd5e9b0817e9169b29"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:465178f7e2a91ad1c6e165c3ec289c90347c905dbd34117c24993c93015a8fa2"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:c08a52ad100f3dabf48feb3a6b17da427061f467dc3b31f8ae5d34335a2e83fb"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:27a19c5320a7b5ec50117c8d45b794bf69af321bf245939003ef7e062f9e1194"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "mysql/8.4/default",
+      "tag": "8.4.13",
+      "digest": "sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:2068651a18ac6048578647ea57b940ca2daed3f504ebe7fba6a93beeb39aaa1f"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:b265fd63b9c8168801c1628b0b21e915846e81192f5a493682a1184cbd70d896"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "mysql/8.0/default",
+      "tag": "8.0.46",
+      "digest": "sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:62fb722c78b24245ddff1796a0fcee4a49cc5b87e0aaaf20c92d1da9e0a2497b"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:213bbfaf699693a40a20a12bb4342d2589a15a3dc7153db698eaed252a92458e"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "mariadb/11.4/default",
+      "tag": "11.4.13",
+      "digest": "sha256:250e1609e93c0e6aecf64bfbab2d84d5e89d2481540fe77447ff6c855c3b1873",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:33a6653ab666774f48818120045f9367a81cd4c54c027412fe294a7d1274e2dc"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:9e6f97b088980593091485ff79b592fd4aee52493e7afcbdce84dbf3659f9099"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:f433135f56fd2f35d9df4518052d7f282b4bf79e1ac866d2a43ae1dd1b8e5cf9"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:2839e4d3b46936876b26e34b808279013047eeffeefc7a6e0f0afc60f6476b77"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "mariadb/10.11/default",
+      "tag": "10.11.19",
+      "digest": "sha256:0d0945c57f75b3a3b9ebe71aedaaad005fa5305054e8fca3d2e42a8c92b43b5e",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:bb27bde261794d326398a9c998ddf9f35db45296d829123bff829cd076f68107"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:e966da5a083b0de741193f400d97b091652ff0c081b31e861e14bd608d95db54"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:1ea67f6975d0d1fafc6c05be07198e2ecd5c058450341c2642b61fc038a35a56"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:0715456206fd1eec0d9844bc86264137b8dff7164c5f29a4b4fe734738329174"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "postgres/16/bookworm",
+      "tag": "16.15-bookworm",
+      "digest": "sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:e92e17ca202da4bb205f6f4a6c8cb30539edfbaa04987b506630f5d5851ff3c8"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:de7d23adce729f54b49e02130f70597dfdfc14dfaa3b7d522dd859611381a2a7"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:9e84722f4e3349d079ddc42c324bf78d3abf99d9819b33cfbdadc1e10ce6abf4"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:cf96b5abb29358277e541abeda48cc0eb96571a1ab17199f2c4f48500f3fedc5"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:2b429c90204d3dc581371d2ce267ffb0aeeddf4968e176de5003037b4d0de8a9"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "postgres/16/alpine",
+      "tag": "16.15-alpine",
+      "digest": "sha256:f4610795587492cd4fb887c2dc3de301b813278bb6f616992061141b5f15ac36",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:cbf42f0edc946c0bc1b8eeed62403734e1f25dc67a3491455d07a92fdb558b28"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:5e493e8ad3e38645a1f93fd545651f827068d1f13b5df97c5e10890984ea9b4b"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:9f328535b038818ac321d6368c1233dee30adc18d816b8008f1797595c897cf5"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:4497c97217dc36d47e0a0051edfc8ad79f4941d4ccd83d15c5fc72ae3146a708"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:e2e27f67864f29c226f4ddee6eefcf4a3eeb4785a66704db7c2401a566611b77"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:7a8050e52090c5f77effbe7e0cbed4a0587306776c3f26dc99933a63c619eaf1"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:a3867de6877494eb1a0af291aeec8c61484f2de29cea853834f5eeb6d283eaec"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "redis/7.4/alpine",
+      "tag": "7.4.11-alpine",
+      "digest": "sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:8be847644e195abc4c10c8d9936cfa45332eccc6b714fa7b186ff43f1f4d5579"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:b4af413c3521d4cde64c2289762dc9ba4dbc7b8513d1fa5b7c1efe9272199acb"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:49b4af28d4051bcab2585dd1158b60e2059eeb89fbc1e0b69850462a9a4466fd"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:1f1bf1d680f501657a3d8966c718c7ff4b7882e324fd0d504f920b8b016ea727"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:cec50de2d2b7302a86ccbb17e63a0b43c14c2e6e26e3815100bd66882ebe1a49"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:12bd99f4555ce357cbe0c950ad42c7a86f76e807244995f0ad0a6b8949c3518a"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:2384fe0ee2f822ab939e8b0cae423d3666f4af6b128a5eb6edaff7365a284ae5"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "memcached/1.6/alpine",
+      "tag": "1.6.45-alpine",
+      "digest": "sha256:6a089e37cbb8acd75c80c6c0667fe57ec54db68782fb1b3afb1d0eb265e50070",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:9057793717e87e054636eaf06cf8ec2792a3ad164ad9e8bcae1e90241ea73fb0"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:8255445e665c15f2a710f591cb04112733944a6ae005e084aad0410d2c84ae18"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:d5338e90fd38277a070f0d62c46c453641805a02a54606d55248cc4ca6d71623"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:4eba6b8b6793f41d9aa18ea81e3fa88d8fbd554682ccaf603a75e08a29d015ff"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:aa7ae3ba559ea809acb9823081e505ccd5283a0fda1096337d05c7bda079b089"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:e09dcc0bc98221ed468081adaa4a78c61d2161f475b1aa0cd282e18573a8ede7"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:62a23a9199acafed359e011c95d8ec002d61dd3ad36d00e9af7d6bd8d0dbb8f0"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "rabbitmq/4.3/management",
+      "tag": "4.3.7-management",
+      "digest": "sha256:79fb281ef7e0a15e3c5e0e12e66e944cebbf14a129493ef464369abd2c48d01a",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:7c5c144218ed359466288d8e84ffb6528e35a787ad20c26b4d5005c836b0678b"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:65432cc5655e992165a5ef28bcf3fe7ae7c1ca10a1bfc01d1c9f2fde21f1e188"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:fe1d83ce26bdb05a4f28e3a1462b80154acc568922f1addc7d3690a57e8c6b87"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:3039098aece3a18a4ceebbb528411e0f3de8e955f09cba3d60e5fbae05e36194"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:06388d629cbdeff9699b204eed88a06d1169730905e2ca121bfeb44db8c266d0"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "rabbitmq/3.13/management",
+      "tag": "3.13.7-management",
+      "digest": "sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:9cfb7e92ae7d296aec4d1ae799e431209f7ed57d55f9c929d95667d0ccf1c920"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:41a7a111dfa8e28550ecf591d83f2ffa920b7fdc290ed60319c74faffddef9b8"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:0ff0c1aecaad05ea42390addc7cfd0975bef76101d4bbdedd019176e59e1d9cf"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:171f7b50b4f756589fd5d2ea7eb24527d36f35135bd6e8b3e02e356bcbd6866e"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:8689ddfceca1ff1ecfeaa6619cb9cfc73570cf5fa022d3d904cdb065da1f925d"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:17771b1cf2d231813885def414c768cc3eb394c1aebe125470a075e5865b9fbc"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "wordpress/stable/php8.4-apache",
+      "tag": "7.1.3-php8.4-apache",
+      "digest": "sha256:edbfa4a140f7c5950435f5737538ad83d25af4661b74b990d7ec1eff3bec99a8",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:b80333353ba417bae6028667e45062a109f68f529d86a1d8dd78783ccfe6efa7"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:6f7cb0e6e84d168574d73c4323da2467f33eb30999fd532fea4cdbd8a59f4634"
+        },
+        {
+          "architecture": "386",
+          "digest": "sha256:73b91f202ae15abb891343e0f5bedfb8c6278db538878d2cf9108b4ec01df511"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:498768a76e0e1ebb0d2c75798ca386873ffdf5d957b2db0180747e8aeab00bca"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:a2c7b293b9cd4a97a9fd52b0b21bbb498783098ee7184beee898b057292b8206"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:e6d455d4a733131f44d4e33037a7f5f3897ed100d30518a0b09d27fa96d589bd"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:fc88d09fa941d862ccc2291fe6aa5f3ee15b581f130c75f9e889592c517cddfd"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "redmine/stable/bookworm",
+      "tag": "7.0.2-bookworm",
+      "digest": "sha256:186090d8d6166fca3bb2eea3ccc8f3f6f03e906067cf0ce4364d0efa46dc99a2",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:51ec2613e42337182b5854dfa89f6e4182e527c8178b6fd0b6e536b3b6b9a6b7"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:c65188bf2ea866ac4c4831de5a558d988208a22af890f6fc5f114210bf2eeb4e"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "phpmyadmin/5.2/apache",
+      "tag": "5.2.3",
+      "digest": "sha256:42a200db07b4e70fbf32c594ad4521cf16399b8e54bbb5adceae98e7566dfbeb",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:42a200db07b4e70fbf32c594ad4521cf16399b8e54bbb5adceae98e7566dfbeb"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "jenkins/LTS/jdk21",
+      "tag": "2.580.1-jdk21",
+      "digest": "sha256:a660310e39ade10631f774bacd5219de767dfd08947ea5c32a739b5e5bb382c1",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:5e70c4e8c97025f7784858bb5c4380912fc17e5fa0f0afa1d4833700a08666eb"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:73b1ce8298f9cbbe11aec6621b82177679a2c0e66189b6aab2914fa1dae86ba2"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:2635653a1b716e0e4be2cfb11bef31e85c133c9cf564c287e4d3764ebae1a433"
+        },
+        {
+          "architecture": "s390x",
+          "digest": "sha256:d8bd2c8e0d3d8e0fefd8cb528a98607557b7257c85ab17fac9a0c53049c3c64c"
+        },
+        {
+          "architecture": "riscv64",
+          "digest": "sha256:68380a04d885ed1bb7dd6d17adeb45ee7ee73445645e8c5859d9154d1c91e6ef"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "portainer/2.45/LTS",
+      "tag": "2.45.3",
+      "digest": "sha256:3609c307943bca8e5c492f69ddd6965df177208b50678a4cff28391c8dd4e96e",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:1c9fd7e7a19941c15bec2c915298a5c95c7d2fab9882772bdb4dbe57a4d019f1"
+        },
+        {
+          "architecture": "ppc64le",
+          "digest": "sha256:190a7a567654311583ec58eafb114fa905ddb7af7acaafc8622e1d1d64b84e49"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:a57ae8195d5b1ab3ecb3b932a4674258f3103e8bedef3685d1204a61d842d03f"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:f482045022127b9a21324f3f1c3c017a740edd1b07f093c5066f117ba9fc07ec"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "ollama/stable/default",
+      "tag": "0.40.11",
+      "digest": "sha256:dea72d1e22270fe095b68fdf756d2b489d615643c5a2eaebbc5f569181e322d8",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:459985308d740b99071719baec2740a60f5b2b2d9b835c171991ae25690203da"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:47da9fc7b3d4582d8ecc772faf1b5dc5df6bf425d9af0285a298c537519567e5"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "certbot/stable/default",
+      "tag": "v5.8.0",
+      "digest": "sha256:f70ad0adbb7e117f0fe42a63c553f28ea451edabc0148757b6efcd9735acaa20",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:398c47284a6d6782825be71685f677ef3a1e65b8b5c278a8b1e99f6da84b4eb9"
+        },
+        {
+          "architecture": "arm64",
+          "digest": "sha256:778be53ef0aaea7ab52e14d251c17847dd212e70221e99dc88d8ce6c84716cca"
+        },
+        {
+          "architecture": "arm",
+          "digest": "sha256:0392d1a47ed8a0b9d030be8dffae205ccae1013eb6e81decc73fa49cdb8cf6cf"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    },
+    {
+      "slotId": "steamcmd/ubuntu/24",
+      "tag": "ubuntu-24",
+      "digest": "sha256:04a017a08509a496128f8a9c102e32707a66becb49b410465a316c63aa0a5068",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "digest": "sha256:04a017a08509a496128f8a9c102e32707a66becb49b410465a316c63aa0a5068"
+        }
+      ],
+      "checkedAt": "2026-10-26T00:22:56.029Z",
+      "scan": {
+        "state": "unscanned",
+        "checkedAt": null,
+        "digest": null,
+        "findings": []
+      }
+    }
+  ]
+}

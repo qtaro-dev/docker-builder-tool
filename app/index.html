@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'" />
   <title>Docker 構成ジェネレータ（モジュール版・プロトタイプ）</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=1400" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
@@ -79,6 +79,12 @@
         </div>
       </div>
 
+      <div class="card">
+        <h2>Dockerイメージのバージョン情報</h2>
+        <button id="updateImageCatalogButton" type="button">オンライン更新</button>
+        <p id="imageCatalogStatus" class="note" role="status">同梱データを読み込んでいます。</p>
+        <p class="note">バージョン情報は固定したDocker Hub配布元から取得します。コンテナやモデルはダウンロード・起動しません。サポート状態と脆弱性検査結果は別です。</p>
+      </div>
       <div id="configSections"></div>
     </section>
 
@@ -102,8 +108,11 @@
       </div>
 
       <div class="card">
-        <h2>生成された Dockerfile（Web 用）</h2>
+        <h2>サービス別 Dockerfile / ビルド設定</h2>
+        <label>表示・保存するファイル：<select id="generatedFileSelect" aria-label="生成ファイル"></select></label>
+        <p id="generatedFilePath" class="note"></p>
         <textarea id="dockerfileOutput" spellcheck="false"></textarea>
+        <p id="generatedSaveStatus" class="note" role="status"></p>
         <div class="button-row">
           <button id="dockerfileDownloadBtn" type="button" class="download-button">
             ダウンロード
@@ -117,8 +126,20 @@
         </div>
       </div>
       </div>
+      <div class="button-row"><button id="generationGuideButton" type="button" disabled>構成ファイルの配置・起動ガイド</button></div>
     </section>
   </main>
+
+  <dialog id="generationGuideDialog" class="app-dialog generation-guide-dialog" aria-labelledby="generationGuideTitle">
+    <header class="guide-header"><h2 id="generationGuideTitle">構成ファイルの配置・起動ガイド</h2></header>
+    <div id="guideScrollBody" class="guide-scroll-body" tabindex="0" aria-label="配置・起動ガイド本文">
+      <p id="guideEditNotice" class="guide-warning" hidden>生成後に内容が編集または個別クリアされています。ガイドは最後に生成した構成を基準にしています。変更したパス・コマンド・内容を照合し、必要なファイルを再生成してください。</p>
+      <section aria-labelledby="guidePlacementTitle"><h3 id="guidePlacementTitle">A. ファイル配置</h3><pre id="generatedPlacementGuide"></pre><div id="guidePlacementNotes"></div></section>
+      <section aria-labelledby="guideStartupTitle"><h3 id="guideStartupTitle">B. 起動手順</h3><ol id="guideStartup"></ol></section>
+      <section aria-labelledby="guideSecurityTitle"><h3 id="guideSecurityTitle">C. 注意事項・セキュリティ</h3><div id="guideSecurity"></div></section>
+    </div>
+    <footer class="guide-footer"><button id="generationGuideCloseButton" type="button" autofocus>閉じる</button></footer>
+  </dialog>
 
   <!-- 設定モーダルダイアログ -->
   <dialog id="settingsDialog" class="app-dialog settings-dialog">
@@ -186,31 +207,39 @@
               <div id="settingsLogDirHint" class="field-hint"></div>
             </div>
           </div>
+          <div class="settings-project-actions">
+            <button id="settingsInitializePathsButton" type="button">初期化</button>
+            <p class="settings-appearance-description">アプリのルート以下に既定フォルダを作成し、パスを入力します。「保存」で設定を確定します。</p>
+            <p id="settingsInitializePathsStatus" class="field-hint" role="status"></p>
+          </div>
         </div>
 
         <!-- 外観 -->
         <div id="settings-appearance" class="settings-section">
-          <h3>外観</h3>
-
-          <label class="settings-field-row">
-            <span>テーマ</span>
-            <select id="settingsTheme" class="settings-theme-select">
-              <option value="system">自動</option>
-              <option value="light">ライト</option>
-              <option value="dark">ダーク</option>
-              <option value="blue">青</option>
-              <option value="green">緑</option>
-              <option value="yellow">黄</option>
-              <option value="orange">オレンジ</option>
-              <option value="red">赤</option>
-              <option value="pink">ピンク</option>
-            </select>
-          </label>
+          <h3 id="settingsAppearanceTitle">外観設定</h3>
+          <p class="settings-appearance-description">テーマを選び、適用して配色を確認できます。保存するまで設定は変更されません。</p>
+          <div id="settingsThemeCards" class="settings-theme-grid" role="radiogroup" aria-label="テーマを選択"></div>
+          <div class="settings-appearance-actions">
+            <button id="settingsApplyThemeButton" type="button" class="primary-button">適用して確認</button>
+            <p id="settingsThemeStatus" role="status" aria-live="polite"></p>
+          </div>
+          <section class="settings-theme-preview" aria-labelledby="settingsPreviewThemeName">
+            <h4 id="settingsPreviewThemeName">配色見本</h4>
+            <div class="settings-preview-header" aria-hidden="true">Docker Builder Tool</div>
+            <div class="settings-preview-tabs" aria-hidden="true">
+              <span class="settings-preview-tab active">モジュール</span><span class="settings-preview-tab">構成入力</span><span class="settings-preview-tab">生成結果</span>
+            </div>
+            <div class="settings-preview-body" aria-hidden="true">
+              <span class="settings-preview-card">画面とカードの配色</span><span class="settings-preview-button">構成を生成</span>
+            </div>
+          </section>
         </div>
 
+        <p id="settingsSaveError" class="settings-save-error" role="alert" hidden></p>
         <div class="settings-footer">
           <button id="settingsSaveButton">保存</button>
-          <button id="settingsCancelButton">キャンセル</button>
+          <button id="settingsCancelButton" type="button" title="テーマの変更を取り消す（画面は閉じません）">キャンセル</button>
+          <button id="settingsCloseButton" type="button">閉じる</button>
         </div>
       </section>
     </div>

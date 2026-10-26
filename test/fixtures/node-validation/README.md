@@ -1,0 +1,5 @@
+# Docker validation fixture
+
+Dockerfileのビルド検証専用の、外部npm依存を持たない最小Node.jsアプリです。
+利用者向けに生成する本番アプリではありません。CIではコンテナ起動・通信は行いません。
+このディレクトリの許可された3ファイルだけを生成したbuild contextへコピーします。

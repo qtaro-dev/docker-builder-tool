@@ -1,12 +1,14 @@
 {
   "name": "docker-builder",
-  "version": "0.2.2",
+  "version": "0.3.0-dev.0",
   "description": "Electron desktop tool for generating Docker Compose configurations",
   "main": "main.js",
   "scripts": {
     "test": "node --test test/*.test.js",
     "start": "electron .",
     "test:electron": "node test/run-electron.js",
+    "test:docker": "node scripts/docker-validation.cjs --run",
+    "test:docker:generate": "node scripts/docker-validation.cjs --generate-only",
     "build:win": "electron-builder --win nsis --x64 --publish never",
     "verify:package": "node scripts/verify-package.cjs"
   },
@@ -31,6 +33,7 @@
       "main.js",
       "preload.js",
       "security.js",
+      "image-catalog.js",
       "package.json",
       "app/**/*",
       "!**/*.log",

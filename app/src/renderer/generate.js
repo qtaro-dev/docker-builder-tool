@@ -8,47 +8,7 @@
 // ==============================
 // [G01] docker-compose.yml 生成ヘルパー
 // ==============================
-function renderComposeYaml(model) {
-  // JSON strings/arrays are valid YAML flow values. Quoting prevents newlines,
-  // comments and YAML metacharacters in user input from adding configuration.
-  const scalar = (value) => JSON.stringify(String(value));
-  const lines = [];
-  lines.push('version: "3.9"');
-  lines.push("services:");
-
-  model.services.forEach((svc) => {
-    lines.push(`  ${scalar(svc.name)}:`);
-    lines.push(`    image: ${scalar(svc.image)}`);
-    if (svc.restart) lines.push(`    restart: ${scalar(svc.restart)}`);
-
-    if (svc.ports && svc.ports.length > 0) {
-      lines.push("    ports:");
-      svc.ports.forEach((p) => lines.push(`      - ${scalar(p)}`));
-    }
-    if (svc.volumes && svc.volumes.length > 0) {
-      lines.push("    volumes:");
-      svc.volumes.forEach((v) => lines.push(`      - ${scalar(v)}`));
-    }
-    if (svc.environment && Object.keys(svc.environment).length > 0) {
-      lines.push("    environment:");
-      Object.entries(svc.environment).forEach(([k, v]) => {
-        lines.push(`      - ${scalar(`${k}=${v}`)}`);
-      });
-    }
-    if (svc.depends_on && svc.depends_on.length > 0) {
-      lines.push("    depends_on:");
-      svc.depends_on.forEach((d) => lines.push(`      - ${scalar(d)}`));
-    }
-    if (svc.command) lines.push(`    command: ${Array.isArray(svc.command) ? JSON.stringify(svc.command.map(String)) : scalar(svc.command)}`);
-  });
-
-  if (model.volumes.size > 0) {
-    lines.push("volumes:");
-    Array.from(model.volumes).forEach((v) => lines.push(`  ${scalar(v)}:`));
-  }
-
-  return lines.join("\n");
-}
+const renderComposeYaml = window.ComposeSerialization.renderComposeYaml;
 // [G01] END
 
 // ==============================
@@ -96,6 +56,7 @@ async function generateConfigs() {
 
   // モジュール未選択時
   if (activeModules.length === 0) {
+    window.__rendererUI.clearResultsOnly();
     if (msg) {
       msg.textContent = "モジュールが選択されていません。";
       msg.classList.add("port-message-error");
@@ -220,6 +181,7 @@ async function generateConfigs() {
 
   // 入力系のエラーがある場合はここで終了
   if (validationErrors.length > 0) {
+    window.__rendererUI.clearResultsOnly();
     if (msg) {
       msg.textContent = validationErrors.concat(warnings).join("\n");
       msg.classList.add("port-message-error");
@@ -227,78 +189,35 @@ async function generateConfigs() {
     return;
   }
 
-  // Compose モデル構築
-  const model = {
-    version: "3.9",
-    services: [],
-    volumes: new Set(),
-  };
-
-  activeModules.forEach((mod) => {
-    const baseCfg = moduleConfigs.get(mod.id) || {};
-    const cfg = { ...baseCfg, projectName };
-
-    cfg.shared = cfg.shared || {};
-    if (cfg.shared && typeof cfg.shared === "object") {
-      cfg.shared.projectName = cfg.shared.projectName || projectName;
-    }
-
-    if (typeof mod.buildCompose === "function") {
-      try {
-        const shared = { projectName, config: cfg };
-        const partial = mod.buildCompose(cfg, shared);
-
-        if (partial && partial.services) model.services.push(...partial.services);
-        if (partial && partial.volumes) partial.volumes.forEach((v) => model.volumes.add(v));
-      } catch (e) {
-        runtimeErrors.push(
-          `${mod.label || mod.name || mod.id} の docker-compose.yml 生成中にエラーが発生しました。`
-        );
-        console.error(e);
-      }
-    }
+  // 確認済みカタログと共通モデルを使い、各サービスのbuildとFROMを揃える。
+  const model = window.ProjectGeneration.build({
+    modules: activeModules, configs: moduleConfigs, projectName,
+    catalog: window.ImageUI.getCatalog(), selections: window.ImageUI.selections,
+    verifiedEntries: window.ImageUI.getVerifiedEntries(),
   });
-
-  // Dockerfile 断片
-  const dockerfileSnippets = [];
-  activeModules.forEach((mod) => {
-    if (typeof mod.buildDockerfile === "function") {
-      const baseCfg = moduleConfigs.get(mod.id) || {};
-      const cfg = { ...baseCfg, projectName };
-
-      cfg.shared = cfg.shared || {};
-      if (cfg.shared && typeof cfg.shared === "object") {
-        cfg.shared.projectName = cfg.shared.projectName || projectName;
-      }
-
-      try {
-        const shared = { projectName, config: cfg };
-        const snippet = mod.buildDockerfile(cfg, shared);
-        if (snippet && snippet.trim()) dockerfileSnippets.push(snippet.trimEnd());
-      } catch (e) {
-        runtimeErrors.push(
-          `${mod.label || mod.name || mod.id} の Dockerfile 生成中にエラーが発生しました。`
-        );
-        console.error(e);
-      }
-    }
-  });
-
-  const composeYaml = renderComposeYaml(model);
-  const dockerfileText = dockerfileSnippets.join("\n\n");
-
+  const restricted = model.errors.length && model.errors.every(error => error.includes("通常生成を制限"));
+  let output = model;
+  if (restricted && confirm(model.errors.concat(model.warnings).join("\n") + "\n\n検証目的で今回だけ制限を解除しますか？ 本番公開には使用しないでください。")) {
+    output = window.ProjectGeneration.build({ modules: activeModules, configs: moduleConfigs, projectName,
+      catalog: window.ImageUI.getCatalog(), verifiedEntries: window.ImageUI.getVerifiedEntries(), selections: window.ImageUI.selections, allowUnsafe: true });
+  }
+  if (output.errors.length) {
+    window.__rendererUI.clearResultsOnly();
+    if (msg) { msg.textContent = output.errors.join("\n"); msg.classList.add("port-message-error"); }
+    return;
+  }
+  warnings.push(...output.warnings);
   const composeOutput = document.getElementById("composeOutput");
-  if (composeOutput) composeOutput.value = composeYaml;
-
-  const dockerfileOutput = document.getElementById("dockerfileOutput");
-  if (dockerfileOutput) dockerfileOutput.value = dockerfileText;
+  if (composeOutput) composeOutput.value = renderComposeYaml(output);
+  window.GeneratedFiles.set(output.files);
+  window.GenerationGuideUI.set(output, projectName);
 
   // メッセージ表示
   if (msg) {
     const messages = [];
     messages.push("構成を生成しました。生成結果タブで内容を確認できます。");
 
-    if (warnings.length > 0) warnings.forEach((w) => messages.push(w));
+    if (warnings.length > 0) messages.push(`警告・確認事項 ${warnings.length}件。各カードと「構成ファイルの配置・起動ガイド」を確認してください。`);
 
     if (runtimeErrors.length > 0) {
       runtimeErrors.forEach((e) => messages.push(e));

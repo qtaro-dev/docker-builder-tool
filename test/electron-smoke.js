@@ -47,7 +47,7 @@ require("./main");
   await until('document.getElementById("composeOutput").value.includes("9090:80")');
   const compose = await run('document.getElementById("composeOutput").value');
   assert.match(compose, /security-test-nginx/);
-  assert.match(compose, /nginx:latest/);
+  assert.match(compose, /nginx:1\.30\.\d+-.+@sha256:[a-f0-9]{64}/);
   console.log("PASS module selection, config inputs and Nginx Compose generation");
 
   // Stub only destination selection; the real save IPC and filesystem run.
@@ -55,7 +55,7 @@ require("./main");
     const destination = path.join(__dirname, filename);
     let selected = false;
     dialog.showSaveDialog = async (_parent, options) => {
-      assert.equal(options.defaultPath, filename);
+      assert.equal(path.basename(options.defaultPath), filename);
       selected = true;
       return { canceled: false, filePath: destination };
     };
@@ -98,7 +98,8 @@ require("./main");
   await until('document.getElementById("settingsDialog").open');
   await run('document.getElementById("settingsProjectRootBrowse").click()');
   await until(`document.getElementById('settingsProjectRootPath').value === ${JSON.stringify(__dirname)}`);
-  await run(`document.getElementById('settingsTheme').value = 'dark';
+  await run(`document.querySelector('.settings-theme-card[data-theme-id="dark"]').click();
+    document.getElementById('settingsApplyThemeButton').click();
     document.getElementById('settingsSaveButton').click();`);
   await until('!document.getElementById("settingsDialog").open');
   assert.equal(JSON.parse(fs.readFileSync(path.join(__dirname, "settings.json"))).theme, "dark");
@@ -114,18 +115,23 @@ require("./main");
   } });
   await foreign.loadURL("data:text/html,<title>Untrusted IPC test</title>");
   assert.equal(await foreign.webContents.executeJavaScript('(async()=>{try{await window.electronAPI.getSettings();return false;}catch{return true;}})()'), true);
+  assert.equal(await foreign.webContents.executeJavaScript('(async()=>{try{await window.electronAPI.updateImageCatalog();return false;}catch{return true;}})()'), true);
   foreign.destroy();
   console.log("PASS save cancellation and rejection of IPC from another window");
 
+  const beforeRejectedSettings = fs.readFileSync(path.join(__dirname, "settings.json"), "utf8");
   for (const code of [
     'window.electronAPI.saveSettings({theme:"invalid"})',
     'window.electronAPI.saveSettings({unexpected:true})',
+    'window.electronAPI.saveSettings({githubToken:"policy-test-placeholder"})',
+    'window.electronAPI.saveSettings({github:{token:"policy-test-placeholder"}})',
     'window.electronAPI.isDirectory(42)',
     'window.electronAPI.pickDirectory({bad:true})',
     'window.electronAPI.writeLog("x".repeat(16385))',
     'window.electronAPI.saveGeneratedFile("../bad.js", "test")',
     'window.electronAPI.saveGeneratedFile("Dockerfile", 42)',
   ]) assert.equal(await run(`(async()=>{try{await ${code};return false;}catch{return true;}})()`), true);
+  assert.equal(fs.readFileSync(path.join(__dirname, "settings.json"), "utf8"), beforeRejectedSettings);
   await run('window.electronAPI.writeLog("test\\nforged-entry")');
   assert.match(fs.readFileSync(path.join(__dirname, "docker-builder.log"), "utf8"), /test forged-entry/);
   console.log("PASS invalid IPC payload rejection and log newline protection");
@@ -135,7 +141,7 @@ require("./main");
   const dockerfile = await run('document.getElementById("dockerfileOutput").value');
   assert.match(dockerfile, /FROM node:/);
   await run('document.querySelector(\'[data-tab="output"]\').click()');
-  assert.equal(await download("dockerfileDownloadBtn", "Dockerfile"), dockerfile);
+  assert.equal(await download("dockerfileDownloadBtn", "Dockerfile.nodejs"), dockerfile);
   menu.items[0].submenu.items[2].click();
   await until('document.getElementById("composeOutput").value === ""');
   menu.items[0].submenu.items[1].click();
@@ -168,6 +174,11 @@ require("./main");
   await delay(100);
   assert.match(wc.getURL(), /index\.html$/);
   console.log("PASS safe error rendering, CSP, popup and navigation restrictions");
+
+  await require("./theme-settings-smoke.cjs")({ run, until, wc, win, errors });
+  await require("./image-electron-smoke.cjs")({ run, until, wc, win, errors });
+  await require("./guide-electron-smoke.cjs")({ run, until, wc, win, errors });
+  await require("./manual-generation-smoke.cjs")({ run, until, wc, win, errors });
 
   await wc.reload();
   await until('document.querySelectorAll(".module-row").length === 19');

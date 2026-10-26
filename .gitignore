@@ -18,6 +18,8 @@ Thumbs.db
 # ===== Your local artifacts =====
 /app.zip
 /docker-builder.log
+/Project/
+/logs/
 
 # バックアップ・作業フォルダ（名前ゆらぎに強い）
 /バージョン*/

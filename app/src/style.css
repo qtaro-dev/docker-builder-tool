@@ -1,3 +1,61 @@
+/* 既存テーマの配色を共通変数へ集約。カードとプレビューも同じ値を使う。 */
+:root, [data-palette] {
+  --theme-page: #f5f5f7;
+  --theme-surface: #ffffff;
+  --theme-header: #ffffff;
+  --theme-text: #222;
+  --theme-muted: #555;
+  --theme-border: #ddd;
+  --theme-accent: #0078d7;
+  --theme-action: #0078d7;
+}
+html[data-theme="dark"], [data-palette="dark"] {
+  --theme-page: #121212;
+  --theme-header: #1e1e1e;
+  --theme-border: #333;
+  --theme-accent: #4aa3ff;
+  --theme-surface: #1e1e1e;
+  --theme-text: #eee;
+  --theme-muted: #aaa;
+  --theme-action: #0050aa;
+}
+html[data-theme="blue"], [data-palette="blue"] {
+  --theme-page: #f2f7ff;
+  --theme-header: #e8f1ff;
+  --theme-border: #9fc0f0;
+  --theme-accent: #2563eb;
+}
+html[data-theme="green"], [data-palette="green"] {
+  --theme-page: #f2fbf5;
+  --theme-header: #e6f6ec;
+  --theme-border: #86d3a0;
+  --theme-accent: #16a34a;
+}
+html[data-theme="yellow"], [data-palette="yellow"] {
+  --theme-page: #fffbea;
+  --theme-header: #fff3c4;
+  --theme-border: #facc15;
+  --theme-accent: #ca8a04;
+}
+html[data-theme="orange"], [data-palette="orange"] {
+  --theme-page: #fff7ed;
+  --theme-header: #ffedd5;
+  --theme-border: #fdba74;
+  --theme-accent: #ea580c;
+}
+html[data-theme="red"], [data-palette="red"] {
+  --theme-page: #fff5f5;
+  --theme-header: #fee2e2;
+  --theme-border: #fca5a5;
+  --theme-accent: #dc2626;
+}
+html[data-theme="pink"], [data-palette="pink"] {
+  --theme-page: #fff1f6;
+  --theme-header: #ffe4ee;
+  --theme-border: #f9a8d4;
+  --theme-accent: #db2777;
+}
+
 /* =========================================
    目次
    1) ベース / 共通
@@ -70,7 +128,7 @@ textarea {
 }
 
 .app-main {
-  width: 1400px;
+  width: 100%;
   max-width: 1400px;
   margin: 12px auto 32px;
   padding: 0 16px;
@@ -265,9 +323,8 @@ textarea {
    ※ 設定画面ではこのセクションの class を使わない前提
    ========================================= */
 .sticky-executor {
-  position: sticky;
-  top: 52px;
-  z-index: 10;
+  /* 入力カードに重ならないよう、通常の文書フローに置く。 */
+  position: static;
   background-color: #ffffff;
 }
 
@@ -653,7 +710,7 @@ button {
 .settings-dialog {
   width: 1050px;      /* ← 横幅：ここを増やす */
   max-width: 90vw;    /* ← 画面に対する最大幅 */
-  height: 520px;      /* ← 縦幅：必要なら */
+  height: 600px;      /* メッセージ表示を見込んで、本文とフッターの余裕を確保 */
   max-height: 85vh;
 }
 
@@ -707,11 +764,6 @@ button {
   display: block;
 }
 
-/* テーマ選択（設定画面：テーマ専用。ここだけに効かせる） */
-.settings-theme-select {
-  width: 220px;     /* 好みで 200〜260px */
-  max-width: 100%;
-}
 
 /* [設定フォーム1行のレイアウト]
    左=ラベル幅、右=入力欄幅。入力欄を長くしたい時はここ。 */
@@ -748,7 +800,7 @@ button {
    左=「...」ボタン幅、右=入力欄。詰まる/広げたい時はここ。 */
 .path-picker {
   display: grid;
-  grid-template-columns: 34px 450px; /* ← 左(…ボタン) / 右(入力欄) */
+  grid-template-columns: 34px minmax(0, 450px); /* ← 左(…ボタン) / 右(入力欄) */
   gap: 8px;
   align-items: center;
 }
@@ -785,23 +837,23 @@ button {
   ========================================= */
 html[data-theme="dark"],
 html[data-theme="dark"] body {
-  background-color: #121212;
+  background-color: var(--theme-page);
   color: #eee;
 }
 
 html[data-theme="dark"] .app-header {
-  background-color: #1e1e1e;
-  border-bottom-color: #333;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 
 html[data-theme="dark"] .theme-toggle-button {
-  background-color: #333;
+  background-color: var(--theme-border);
   border-color: #555;
   color: #eee;
 }
 
 html[data-theme="dark"] .tabs {
-  border-bottom-color: #333;
+  border-bottom-color: var(--theme-border);
 }
 
 html[data-theme="dark"] .tab-button {
@@ -810,12 +862,12 @@ html[data-theme="dark"] .tab-button {
 
 html[data-theme="dark"] .tab-button.active {
   color: #fff;
-  border-bottom-color: #4aa3ff;
+  border-bottom-color: var(--theme-accent);
 }
 
 html[data-theme="dark"] .card {
-  background-color: #1e1e1e;
-  border-color: #333;
+  background-color: var(--theme-header);
+  border-color: var(--theme-border);
   box-shadow: none;
 }
 
@@ -861,7 +913,7 @@ html[data-theme="dark"] .field-row input.port-conflict {
 }
 
 html[data-theme="dark"] .button-row button {
-  background-color: #333;
+  background-color: var(--theme-border);
   border-color: #555;
   color: #eee;
 }
@@ -872,7 +924,7 @@ html[data-theme="dark"] .button-row button:hover {
 }
 
 html[data-theme="dark"] .btn-browse {
-  background-color: #333;
+  background-color: var(--theme-border);
   border-color: #555;
   color: #eee;
 }
@@ -926,8 +978,8 @@ html[data-theme="dark"] #portMessage.port-message-ok {
 
 /* ダークモード時のモーダル（共通） */
 html[data-theme="dark"] .app-dialog {
-  background-color: #1e1e1e;
-  border-color: #333;
+  background-color: var(--theme-header);
+  border-color: var(--theme-border);
   color: #eee;
 }
 
@@ -936,7 +988,7 @@ html[data-theme="dark"] .dialog-description {
 }
 
 html[data-theme="dark"] .dialog-footer button {
-  background-color: #333;
+  background-color: var(--theme-border);
   border-color: #555;
   color: #eee;
 }
@@ -970,133 +1022,133 @@ html[data-theme="dark"] .settings-nav-item.active {
 /* Blue */
 html[data-theme="blue"],
 html[data-theme="blue"] body {
-  background-color: #f2f7ff;
+  background-color: var(--theme-page);
 }
 html[data-theme="blue"] .app-header {
-  background-color: #e8f1ff;
-  border-bottom-color: #9fc0f0;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="blue"] .tabs {
-  border-bottom-color: #9fc0f0;
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="blue"] .tab-button.active {
-  border-bottom-color: #2563eb;
+  border-bottom-color: var(--theme-accent);
 }
 html[data-theme="blue"] .primary-button {
-  border-color: #2563eb;
+  border-color: var(--theme-accent);
 }
 html[data-theme="blue"] .generate-separator {
-  background-color: #9fc0f0;
+  background-color: var(--theme-border);
 }
 
 /* Green */
 html[data-theme="green"],
 html[data-theme="green"] body {
-  background-color: #f2fbf5;
+  background-color: var(--theme-page);
 }
 html[data-theme="green"] .app-header {
-  background-color: #e6f6ec;
-  border-bottom-color: #86d3a0;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="green"] .tabs {
-  border-bottom-color: #86d3a0;
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="green"] .tab-button.active {
-  border-bottom-color: #16a34a;
+  border-bottom-color: var(--theme-accent);
 }
 html[data-theme="green"] .primary-button {
-  border-color: #16a34a;
+  border-color: var(--theme-accent);
 }
 html[data-theme="green"] .generate-separator {
-  background-color: #86d3a0;
+  background-color: var(--theme-border);
 }
 
 /* Yellow */
 html[data-theme="yellow"],
 html[data-theme="yellow"] body {
-  background-color: #fffbea;
+  background-color: var(--theme-page);
 }
 html[data-theme="yellow"] .app-header {
-  background-color: #fff3c4;
-  border-bottom-color: #facc15;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="yellow"] .tabs {
-  border-bottom-color: #facc15;
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="yellow"] .tab-button.active {
-  border-bottom-color: #ca8a04;
+  border-bottom-color: var(--theme-accent);
 }
 html[data-theme="yellow"] .primary-button {
-  border-color: #ca8a04;
+  border-color: var(--theme-accent);
 }
 html[data-theme="yellow"] .generate-separator {
-  background-color: #facc15;
+  background-color: var(--theme-border);
 }
 
 /* Orange */
 html[data-theme="orange"],
 html[data-theme="orange"] body {
-  background-color: #fff7ed;
+  background-color: var(--theme-page);
 }
 html[data-theme="orange"] .app-header {
-  background-color: #ffedd5;
-  border-bottom-color: #fdba74;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="orange"] .tabs {
-  border-bottom-color: #fdba74;
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="orange"] .tab-button.active {
-  border-bottom-color: #ea580c;
+  border-bottom-color: var(--theme-accent);
 }
 html[data-theme="orange"] .primary-button {
-  border-color: #ea580c;
+  border-color: var(--theme-accent);
 }
 html[data-theme="orange"] .generate-separator {
-  background-color: #fdba74;
+  background-color: var(--theme-border);
 }
 
 /* Red */
 html[data-theme="red"],
 html[data-theme="red"] body {
-  background-color: #fff5f5;
+  background-color: var(--theme-page);
 }
 html[data-theme="red"] .app-header {
-  background-color: #fee2e2;
-  border-bottom-color: #fca5a5;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="red"] .tabs {
-  border-bottom-color: #fca5a5;
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="red"] .tab-button.active {
-  border-bottom-color: #dc2626;
+  border-bottom-color: var(--theme-accent);
 }
 html[data-theme="red"] .primary-button {
-  border-color: #dc2626;
+  border-color: var(--theme-accent);
 }
 html[data-theme="red"] .generate-separator {
-  background-color: #fca5a5;
+  background-color: var(--theme-border);
 }
 
 /* Pink */
 html[data-theme="pink"],
 html[data-theme="pink"] body {
-  background-color: #fff1f6;
+  background-color: var(--theme-page);
 }
 html[data-theme="pink"] .app-header {
-  background-color: #ffe4ee;
-  border-bottom-color: #f9a8d4;
+  background-color: var(--theme-header);
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="pink"] .tabs {
-  border-bottom-color: #f9a8d4;
+  border-bottom-color: var(--theme-border);
 }
 html[data-theme="pink"] .tab-button.active {
-  border-bottom-color: #db2777;
+  border-bottom-color: var(--theme-accent);
 }
 html[data-theme="pink"] .primary-button {
-  border-color: #db2777;
+  border-color: var(--theme-accent);
 }
 html[data-theme="pink"] .generate-separator {
-  background-color: #f9a8d4;
+  background-color: var(--theme-border);
 }
 
 /* =========================================
@@ -1111,3 +1163,102 @@ html[data-theme="pink"] .generate-separator {
 
 /* Keep validation messages readable without interpreting input as HTML. */
 .generate-message { white-space: pre-line; }
+
+/* 外観設定：スクロールは本文内に収め、保存・キャンセルは常に操作できる。 */
+.settings-dialog { min-height: 0; background: var(--theme-surface); color: var(--theme-text); }
+html .settings-dialog .settings-nav { background: var(--theme-header); border-color: var(--theme-border); }
+html .settings-dialog .settings-nav-item { color: var(--theme-text); }
+html .settings-dialog .settings-nav-item.active { background: var(--theme-page); outline: 1px solid var(--theme-border); }
+.settings-layout { min-width: 0; min-height: 0; grid-template-columns: 150px minmax(0, 1fr); }
+.settings-content { min-width: 0; min-height: 0; overflow: hidden; }
+.settings-section { min-height: 0; overflow-y: auto; padding-right: 4px; }
+.settings-section h3 { margin: 0 0 6px; font-size: 16px; }
+.settings-footer { flex-shrink: 0; }
+.settings-footer button {
+  padding: 6px 16px; border: 1px solid var(--theme-border); border-radius: 6px;
+  background: var(--theme-surface); color: var(--theme-text); cursor: pointer;
+}
+.settings-footer #settingsSaveButton { border-color: var(--theme-accent); font-weight: 600; }
+.settings-dialog button:focus-visible { outline: 2px solid var(--theme-accent); outline-offset: 3px; }
+.settings-dialog button:disabled { opacity: .6; cursor: default; }
+.settings-appearance-description { margin: 0 0 12px; font-size: 12px; line-height: 1.6; color: var(--theme-muted); }
+.settings-theme-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.settings-theme-card {
+  position: relative; min-width: 0; display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; min-height: 54px; border: 2px solid var(--theme-border); border-radius: 8px;
+  color: var(--theme-text); background: var(--theme-surface); cursor: pointer; text-align: left;
+}
+.settings-theme-card[aria-checked="true"] { border-color: var(--theme-text); background: var(--theme-header); }
+.settings-theme-swatch {
+  display: block; width: 48px; height: 32px; flex-shrink: 0; border: 1px solid var(--theme-border); border-radius: 4px;
+  background: linear-gradient(to bottom, var(--theme-header) 0 28%, var(--theme-accent) 28% 36%, var(--theme-page) 36% 100%);
+}
+.settings-theme-name { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.settings-theme-check { margin-left: auto; visibility: hidden; font-weight: 700; }
+.settings-theme-card[aria-checked="true"] .settings-theme-check { visibility: visible; }
+.settings-appearance-actions { margin: 12px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.settings-appearance-actions .primary-button { font-size: 13px; }
+#settingsThemeStatus { margin: 0; font-size: 12px; color: var(--theme-muted); }
+.settings-theme-preview { border: 1px solid var(--theme-border); border-radius: 8px; overflow: hidden; background: var(--theme-page); }
+.settings-theme-preview h4 { margin: 0; padding: 6px 10px; font-size: 12px; font-weight: 500; color: var(--theme-muted); }
+.settings-preview-header { padding: 6px 10px; background: var(--theme-header); color: var(--theme-text); font-size: 12px; font-weight: 600; }
+.settings-preview-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--theme-border); padding: 0 8px; }
+.settings-preview-tab { padding: 5px 6px; color: var(--theme-muted); font-size: 11px; }
+.settings-preview-tab.active { color: var(--theme-text); border-bottom: 2px solid var(--theme-accent); }
+.settings-preview-body { padding: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.settings-preview-card { flex: 1; padding: 8px; border: 1px solid var(--theme-border); border-radius: 5px; background: var(--theme-surface); font-size: 12px; }
+.settings-preview-button { padding: 5px 9px; border: 1px solid var(--theme-accent); border-radius: 4px; background: var(--theme-action); color: #fff; font-size: 11px; }
+/* メッセージ2行分を常に確保し、表示時に本文を縮めたりスクロールを増やさない。 */
+.settings-save-error { flex-shrink: 0; min-height: 2.8em; line-height: 1.4; margin: 8px 0 0; font-size: 13px; font-weight: 600; color: var(--theme-text); white-space: pre-line; }
+.settings-save-error[hidden] { display: block; visibility: hidden; }
+.settings-project-actions { margin-top: 14px; }
+.settings-project-actions button { padding: 6px 16px; border: 1px solid var(--theme-border); border-radius: 6px; background: var(--theme-surface); color: var(--theme-text); cursor: pointer; }
+.settings-project-actions .settings-appearance-description { margin: 8px 0 0; }
+
+@media (max-width: 700px) {
+  .settings-dialog { max-width: calc(100vw - 24px); }
+  .settings-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .settings-nav { flex-direction: row; border-right: none; border-bottom: 1px solid var(--theme-border); padding: 8px; }
+  .settings-content { padding: 12px; }
+  .settings-field-row { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .settings-field-input-wrapper, .path-picker { width: 100%; }
+  .settings-theme-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 360px) {
+  .settings-theme-grid { grid-template-columns: minmax(0, 1fr); }
+}
+/* バージョンの状態は色だけに頼らず、各テーマの既存文字色で表示する。 */
+.image-version-panel { padding: 10px; margin: 8px 0 14px; border: 1px solid currentColor; border-radius: 6px; }
+.image-version-panel label { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.image-version-panel select { max-width: 100%; }
+.image-version-panel select, #generatedFileSelect { color: var(--theme-text); background: var(--theme-surface); border: 1px solid var(--theme-border); padding: 5px; border-radius: 4px; }
+.image-tag { display: block; overflow-wrap: anywhere; }
+.image-status, #generatedPlacementGuide, #generatedFilePath, #generatedSaveStatus { white-space: pre-wrap; overflow-wrap: anywhere; }
+#tab-output.active { height: auto; min-height: calc(100vh - 140px); }
+#tab-output .output-split { flex: 0 0 auto; min-height: 440px; }
+.image-version-panel { font-size: 14px; }
+.image-version-panel select { min-width: 140px; font-size: 14px; }
+.image-details summary { cursor: pointer; padding: 6px 0; }
+.image-detail-text, .node-runtime-notice { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; }
+.image-detail-text { user-select: text; }
+.node-runtime-notice { padding: 10px; border-left: 3px solid var(--theme-accent); }
+#generationGuideButton { padding: 9px 16px; color: var(--theme-text); background: var(--theme-surface); border: 1px solid var(--theme-border); border-radius: 6px; font-size: 14px; }
+#generationGuideButton:disabled { opacity: .6; }
+.app-dialog.generation-guide-dialog { width: min(920px, calc(100vw - 32px)); min-height: 0; height: min(760px, calc(100vh - 40px)); max-height: calc(100vh - 40px); color: var(--theme-text); background: var(--theme-surface); border-color: var(--theme-border); }
+.generation-guide-dialog[open] { display: flex; flex-direction: column; }
+.guide-header, .guide-footer { flex-shrink: 0; padding: 16px 20px; background: var(--theme-header); }
+.guide-header { border-bottom: 1px solid var(--theme-border); }
+.guide-header h2 { font-size: 18px; margin: 0; }
+.guide-scroll-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 20px 16px; font-size: 14px; line-height: 1.7; }
+.guide-scroll-body h3 { font-size: 16px; padding-bottom: 6px; border-bottom: 1px solid var(--theme-border); margin: 20px 0 12px; }
+.guide-scroll-body p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.guide-scroll-body pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: var(--theme-page); border: 1px solid var(--theme-border); border-radius: 6px; font-size: 14px; }
+.guide-scroll-body li { margin-bottom: 14px; }
+.guide-scroll-body ol { padding-left: 24px; }
+.guide-warning { padding: 12px; border-left: 3px solid var(--theme-accent); font-weight: 600; }
+.guide-footer { display: flex; justify-content: flex-end; border-top: 1px solid var(--theme-border); }
+.guide-footer button { padding: 6px 18px; background: var(--theme-surface); color: var(--theme-text); border: 1px solid var(--theme-border); border-radius: 6px; font-size: 14px; }
+@media (max-width: 760px) {
+  #tab-output .output-split { flex-direction: column; }
+  #tab-output .output-split .card { min-height: 320px; }
+}

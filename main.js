@@ -4,6 +4,9 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, dialog } = require("electron");
 const fs = require("fs");
 const path = require("path");
+const { createStore } = require("./image-catalog");
+const { buildModules } = require("./app/src/project-generation");
+const imageStore = createStore(app.getPath("userData"), require("./app/data/image-catalog.json"));
 
 const { entryURL, text, record, validateSettings, assertTrustedSender } = require("./security");
 
@@ -17,6 +20,13 @@ function handle(channel, callback) {
 
 // IPC: アプリバージョン取得
 handle("get-app-version", () => app.getVersion());
+
+// 固定された配布元のメタデータだけを取得。Rendererに通信権限は与えない。
+handle("images:get", () => imageStore.read());
+handle("images:update", async () => {
+  try { return { ok: true, catalog: await imageStore.update() }; }
+  catch (error) { return { ok: false, error: error.message, catalog: await imageStore.read() }; }
+});
 
 // アプリ本体のあるフォルダ
 const appRootDir = app.isPackaged
@@ -277,6 +287,28 @@ function saveSettings(newSettings) {
 
 let currentSettings = loadSettings();
 
+// 作成先はmain側の固定パスだけ。rendererから任意の保存先・名前を受け取らない。
+handle("settings:initializeProjectPaths", async () => {
+  const paths = {
+    projectRoot: path.join(appRootDir, "Project"),
+    composeDir: path.join(appRootDir, "Project", "docker-compose"),
+    dockerfileDir: path.join(appRootDir, "Project", "Dockerfiles"),
+    logDir: path.join(appRootDir, "logs"),
+  };
+  for (const directory of Object.values(paths)) {
+    let stat;
+    try { stat = await fs.promises.lstat(directory); }
+    catch (error) { if (error.code !== "ENOENT") throw error; }
+    // 既存データは消さず、リンク経由でアプリ外へ作成することも避ける。
+    if (stat && (stat.isSymbolicLink() || !stat.isDirectory())) {
+      throw new Error("既定パスにフォルダ以外の項目またはリンクがあります。");
+    }
+    if (!stat) await fs.promises.mkdir(directory);
+  }
+  // 初期化は作成と入力値の提供まで。設定ファイルは「保存」で確定する。
+  return paths;
+});
+
 handle("directory:check", async (_event, value) => {
   const directory = text(value);
   if (!directory) return false;
@@ -286,19 +318,28 @@ handle("directory:check", async (_event, value) => {
 
 // The renderer supplies content, never an arbitrary destination path. A native
 // save dialog gives the user control of the destination and overwrite consent.
+let lastComposeDirectory;
 handle("file:saveGenerated", async (_event, filename, content) => {
-  if (!["docker-compose.yml", "Dockerfile"].includes(filename)) {
+  const generatedNames = buildModules.flatMap(id => [`Dockerfile.${id}`, `Dockerfile.${id}.dockerignore`]);
+  if (!["docker-compose.yml", "Dockerfile", ...generatedNames].includes(filename)) {
     throw new TypeError("Invalid generated filename");
   }
   content = text(content, 2 * 1024 * 1024);
+  const moduleId = filename.slice("Dockerfile.".length).replace(/\.dockerignore$/, "");
   const result = await dialog.showSaveDialog(mainWindow, {
     title: "生成ファイルを保存",
-    defaultPath: filename,
+    defaultPath: lastComposeDirectory && filename.startsWith("Dockerfile.")
+      ? path.join(lastComposeDirectory, moduleId, filename) : filename,
     properties: ["showOverwriteConfirmation"],
   });
   if (result.canceled || !result.filePath) return { canceled: true };
   await fs.promises.writeFile(result.filePath, content, "utf8");
-  return { canceled: false };
+  if (filename === "docker-compose.yml") lastComposeDirectory = path.dirname(result.filePath);
+  const expected = filename.startsWith("Dockerfile.") && lastComposeDirectory
+    ? path.join(lastComposeDirectory, moduleId, filename) : null;
+  return { canceled: false, path: result.filePath,
+    placementWarning: expected && path.resolve(result.filePath) !== path.resolve(expected)
+      ? `Composeが参照する場所は ${expected} です。移動するかComposeのbuild指定を合わせてください。` : "" };
 });
 
 handle("settings:path", () => settingsPath);

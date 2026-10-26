@@ -9,6 +9,15 @@
 // [M01] モジュールレジストリ
 // ==============================
 const moduleRegistry = [];
+// カードを再作成しても他サービスの入力を消さない。新規構成時だけ明示的に消す。
+const configDrafts = new Map();
+function captureConfigDrafts() {
+  document.querySelectorAll("#configSections section[data-module-id]").forEach(section => {
+    const draft = {};
+    section.querySelectorAll("input[data-field-name], select[data-field-name]").forEach(el => { draft[el.dataset.fieldName] = el.value; });
+    configDrafts.set(section.dataset.moduleId, draft);
+  });
+}
 
 // モジュール並び順（同カテゴリ内）
 const moduleOrderMap = {
@@ -166,10 +175,11 @@ function getSelectedModuleIds() {
 // ==============================
 // [M03] 構成入力 UI 描画
 // ==============================
-function renderConfigSections() {
+function renderConfigSections(reset = false) {
   const container = document.getElementById("configSections");
   if (!container) return;
 
+  if (reset === true) configDrafts.clear(); else captureConfigDrafts();
   container.innerHTML = "";
 
   const selectedIds = getSelectedModuleIds();
@@ -183,6 +193,8 @@ function renderConfigSections() {
     const h2 = document.createElement("h2");
     h2.textContent = mod.label || mod.name || mod.id || "";
     section.appendChild(h2);
+    window.ImageUI?.appendControls(section, mod);
+    const draft = configDrafts.get(mod.id) || {};
 // 条件付き表示/自動入力のための参照テーブル
 const __fieldRows = new Map();
 const __fieldInputs = new Map();
@@ -230,6 +242,7 @@ const __fieldBrowseBtns = new Map();
         });
 
         if (field.default !== undefined) select.value = String(field.default);
+        if (Object.hasOwn(draft, field.name)) select.value = draft[field.name];
 
         select.dataset.fieldName = field.name;
         select.dataset.moduleId = mod.id;
@@ -244,6 +257,7 @@ const __fieldBrowseBtns = new Map();
       const input = document.createElement("input");
       input.type = field.type || "text";
       if (field.default !== undefined) input.value = field.default;
+      if (Object.hasOwn(draft, field.name)) input.value = draft[field.name];
 
       input.dataset.fieldName = field.name;
       input.dataset.moduleId = mod.id;
@@ -280,7 +294,7 @@ const __fieldBrowseBtns = new Map();
           input.value = current;
         };
 
-        toggleCheckbox.checked = false;
+        toggleCheckbox.checked = input.value === "flask";
         updateFramework();
 
         toggleCheckbox.addEventListener("change", updateFramework);
@@ -381,6 +395,19 @@ const __updateConditionalUI = () => {
 
 // 初期反映
 __updateConditionalUI();
+
+    if (mod.id === "nodejs") {
+      const notice = document.createElement("p"); notice.className = "node-runtime-notice";
+      const updateNotice = () => {
+        const cfg = Object.fromEntries([...__fieldInputs].map(([key, input]) => [key, input.value]));
+        notice.textContent = window.ProjectGeneration.nodeAdvice(cfg).join("\n");
+      };
+      for (const name of ["dataStoreType", "startCmd"]) {
+        __fieldInputs.get(name)?.addEventListener("change", updateNotice);
+        __fieldInputs.get(name)?.addEventListener("input", updateNotice);
+      }
+      updateNotice(); section.appendChild(notice);
+    }
 
     container.appendChild(section);
   });

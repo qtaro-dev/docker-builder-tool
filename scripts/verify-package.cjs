@@ -7,7 +7,7 @@ const root = path.resolve(__dirname, '..');
 const archive = path.resolve(process.argv[2] || path.join(root, 'release/win-unpacked/resources/app.asar'));
 const entries = asar.listPackage(archive).map(name => name.replaceAll('\\', '/').replace(/^\//, ''));
 const files = entries.filter(name => !asar.statFile(archive, path.normalize(name)).files);
-const expected = ['main.js', 'preload.js', 'security.js', 'package.json'];
+const expected = ['main.js', 'preload.js', 'security.js', 'image-catalog.js', 'package.json'];
 function walk(directory) {
   for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes: true })) {
     const relative = `${directory}/${entry.name}`;
