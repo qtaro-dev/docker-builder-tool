@@ -19,6 +19,10 @@ require("./main");
   await app.whenReady();
   const win = BrowserWindow.getAllWindows()[0];
   const wc = win.webContents;
+  // 小さいCI仮想画面でも通常画面のレイアウト検証を再現する。
+  // 狭幅の確認は各テストで別途リサイズし、アプリ本体の寸法は変更しない。
+  win.setContentSize(1280, 900);
+  console.log('Electron test viewport:', win.getContentSize());
   const run = (code) => wc.executeJavaScript(code, true);
   const until = async (code) => {
     for (let i = 0; i < 100; i++) {
