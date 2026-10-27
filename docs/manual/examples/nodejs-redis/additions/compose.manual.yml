@@ -1,0 +1,4 @@
+services:
+  nodejs-redis-nodejs:
+    environment:
+      REDIS_URL: redis://nodejs-redis-redis:6379

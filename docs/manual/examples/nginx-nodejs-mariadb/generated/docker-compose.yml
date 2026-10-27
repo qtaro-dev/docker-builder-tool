@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  "nginx-nodejs-mariadb-nginx":
+    image: "nginx:1.30.6-trixie@sha256:a7675fcee220f59b4a99f7098c06a0d5d999c2c0ee37c0211efb780536e5cb20"
+    restart: "always"
+    ports:
+      - "18080:80"
+    volumes:
+      - "./fixture-web:/usr/share/nginx/html:ro"
+  "nginx-nodejs-mariadb-mariadb":
+    image: "mariadb:11.4.13@sha256:250e1609e93c0e6aecf64bfbab2d84d5e89d2481540fe77447ff6c855c3b1873"
+    restart: "always"
+    ports:
+      - "13307:3306"
+    volumes:
+      - "nginx-nodejs-mariadb-mariadb-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+  "nginx-nodejs-mariadb-nodejs":
+    build:
+      context: "./nodejs"
+      dockerfile: "Dockerfile.nodejs"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "13000:3000"
+    command: ["sh","-c","npm run dev"]
+volumes:
+  "nginx-nodejs-mariadb-mariadb-data":

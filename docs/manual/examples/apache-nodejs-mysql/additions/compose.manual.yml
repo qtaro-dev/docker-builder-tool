@@ -1,0 +1,12 @@
+services:
+  apache-nodejs-mysql-nodejs:
+    environment:
+      DB_HOST: apache-nodejs-mysql-mysql
+      DB_NAME: appdb
+      DB_USER: appuser
+      DB_PASSWORD: demo-recipe-only-42
+  apache-nodejs-mysql-apache:
+    volumes:
+      - ./config/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+    depends_on:
+      - apache-nodejs-mysql-nodejs

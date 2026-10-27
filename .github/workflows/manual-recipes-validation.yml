@@ -1,0 +1,112 @@
+name: Manual recipes runtime validation
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-recipes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/codex/appearance-theme-preview'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - id: plan
+        name: Split the manual list into batches of at most six
+        run: |
+          node -e "const p=require('./scripts/lib/manual-recipe-plan.cjs');require('node:fs').appendFileSync(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify({include:p.batches().map(b=>({batch:b.batch}))})+'\n')"
+
+  batches:
+    name: Recipe batch ${{ matrix.batch }}
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      # 一度に1グループ。次のジョブは新しいrunnerで開始する。
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      MANUAL_RECIPE_ARTIFACTS: ${{ runner.temp }}/recipe-results
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          package-manager-cache: false
+      - run: npm ci
+      - name: Check Docker and PowerShell availability
+        run: |
+          docker version
+          docker compose version
+          pwsh --version
+      - name: Build, start and test recipes
+        run: node scripts/manual-recipes-validation.cjs --run ${{ matrix.batch }}
+        timeout-minutes: 53
+      - name: Cleanup only projects owned by this batch
+        if: always()
+        run: node scripts/manual-recipes-validation.cjs --cleanup
+        timeout-minutes: 5
+      - name: Preserve checklist and diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: recipe-batch-${{ matrix.batch }}
+          path: ${{ runner.temp }}/recipe-results/
+          retention-days: 14
+          if-no-files-found: warn
+          include-hidden-files: false
+
+  checklist:
+    name: Complete recipe checklist
+    if: always() && needs.plan.result == 'success'
+    needs: [plan, batches]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - run: npm ci
+      - name: Collect all batch evidence
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: recipe-batch-*
+          path: ${{ runner.temp }}/recipe-checklist
+      - name: Publish all recipes, including failures and untested entries
+        if: always()
+        env:
+          MANUAL_RECIPE_ARTIFACTS: ${{ runner.temp }}/recipe-checklist
+        run: node scripts/manual-recipes-validation.cjs --merge
+      - name: Preserve complete checklist
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: manual-recipe-checklist
+          path: |
+            ${{ runner.temp }}/recipe-checklist/checklist.md
+            ${{ runner.temp }}/recipe-checklist/results.json
+          retention-days: 30
+          if-no-files-found: warn

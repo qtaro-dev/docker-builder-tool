@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  "nodejs-redis-redis":
+    image: "redis:7.4.11-alpine@sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541"
+    restart: "always"
+    ports:
+      - "16379:6379"
+    volumes:
+      - "nodejs-redis-redis-data:/data"
+  "nodejs-redis-nodejs":
+    build:
+      context: "./nodejs"
+      dockerfile: "Dockerfile.nodejs"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "13000:3000"
+    command: ["sh","-c","npm run dev"]
+volumes:
+  "nodejs-redis-redis-data":

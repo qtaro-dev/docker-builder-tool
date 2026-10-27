@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  "mysql-basic-mysql":
+    image: "mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69"
+    restart: "always"
+    ports:
+      - "13306:3306"
+    volumes:
+      - "mysql-basic-mysql-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+volumes:
+  "mysql-basic-mysql-data":

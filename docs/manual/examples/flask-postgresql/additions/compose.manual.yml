@@ -1,0 +1,7 @@
+services:
+  flask-postgresql-flask:
+    environment:
+      DB_HOST: flask-postgresql-postgres
+      DB_NAME: appdb
+      DB_USER: appuser
+      DB_PASSWORD: demo-recipe-only-42

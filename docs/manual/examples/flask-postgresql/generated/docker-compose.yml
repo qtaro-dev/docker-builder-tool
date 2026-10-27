@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  "flask-postgresql-postgres":
+    image: "postgres:16.15-bookworm@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0"
+    restart: "always"
+    ports:
+      - "15432:5432"
+    volumes:
+      - "flask-postgresql-postgres-data:/var/lib/postgresql/data"
+    environment:
+      - "POSTGRES_DB=appdb"
+      - "POSTGRES_USER=appuser"
+      - "POSTGRES_PASSWORD=demo-recipe-only-42"
+  "flask-postgresql-flask":
+    build:
+      context: "./python-web"
+      dockerfile: "Dockerfile.python-web"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "15000:5000"
+    volumes:
+      - "./python-web:/app"
+    environment:
+      - "FRAMEWORK=flask"
+    command: ["sh","-c","flask run --host=0.0.0.0 --port=5000"]
+volumes:
+  "flask-postgresql-postgres-data":

@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  "rabbitmq-basic-rabbitmq":
+    image: "rabbitmq:4.3.7-management@sha256:79fb281ef7e0a15e3c5e0e12e66e944cebbf14a129493ef464369abd2c48d01a"
+    restart: "always"
+    ports:
+      - "15673:5672"
+      - "15674:15672"
+    volumes:
+      - "rabbitmq-basic-rabbitmq-data:/var/lib/rabbitmq"
+volumes:
+  "rabbitmq-basic-rabbitmq-data":

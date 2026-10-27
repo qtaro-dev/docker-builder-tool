@@ -128,17 +128,18 @@ test('summary reports not-run cases when prerequisites fail instead of claiming 
   }
 }));
 
-test('workflow keeps development triggers, read-only PR permissions and real Electron validation separate', () => {
+test('workflow uses manual dispatch only, read-only permissions and separate real Electron validation', () => {
   const doc = yaml.load(fs.readFileSync(path.join(__dirname, '../.github/workflows/docker-validation.yml'), 'utf8'));
   assert.deepEqual(doc.permissions, { contents: 'read' });
-  assert.deepEqual(doc.on.push.branches, ['codex/appearance-theme-preview']);
-  assert.deepEqual(doc.on.pull_request.branches, doc.on.push.branches);
+  assert.equal(doc.on.push, undefined);
+  assert.equal(doc.on.pull_request, undefined);
   assert.ok(Object.hasOwn(doc.on, 'workflow_dispatch'));
   assert.equal(Object.hasOwn(doc.on, 'pull_request_target'), false);
   assert.equal(doc.jobs['docker-validation']['runs-on'], 'ubuntu-24.04');
   assert.equal(doc.jobs['electron-regression']['runs-on'], 'windows-2025');
   assert.ok(doc.jobs['electron-regression'].steps.some(s => s.run?.includes('npm run test:electron')));
   for (const job of Object.values(doc.jobs)) {
+    if(job.uses) {assert.equal(job.uses,'./.github/workflows/manual-recipes-validation.yml');continue;}
     assert.ok(job['timeout-minutes'] <= 35);
     for (const step of job.steps) {
       assert.equal(step['continue-on-error'], undefined);

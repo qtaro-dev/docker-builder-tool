@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  "jenkins-basic-jenkins":
+    build:
+      context: "./jenkins"
+      dockerfile: "Dockerfile.jenkins"
+    restart: "always"
+    ports:
+      - "18088:8080"
+      - "15050:50000"
+    volumes:
+      - "jenkins-basic-jenkins-home:/var/jenkins_home"
+volumes:
+  "jenkins-basic-jenkins-home":

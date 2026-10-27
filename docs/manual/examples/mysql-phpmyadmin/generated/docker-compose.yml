@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  "mysql-phpmyadmin-mysql":
+    image: "mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69"
+    restart: "always"
+    ports:
+      - "13306:3306"
+    volumes:
+      - "mysql-phpmyadmin-mysql-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+  "mysql-phpmyadmin-phpmyadmin":
+    image: "phpmyadmin/phpmyadmin:5.2.3@sha256:42a200db07b4e70fbf32c594ad4521cf16399b8e54bbb5adceae98e7566dfbeb"
+    restart: "always"
+    ports:
+      - "18081:80"
+    environment:
+      - "PMA_HOST=mysql-phpmyadmin-mysql"
+      - "PMA_USER=appuser"
+      - "PMA_PASSWORD=demo-recipe-only-42"
+    depends_on:
+      - "mysql-phpmyadmin-mysql"
+volumes:
+  "mysql-phpmyadmin-mysql-data":

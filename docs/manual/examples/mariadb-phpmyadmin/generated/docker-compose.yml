@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  "mariadb-phpmyadmin-phpmyadmin":
+    image: "phpmyadmin/phpmyadmin:5.2.3@sha256:42a200db07b4e70fbf32c594ad4521cf16399b8e54bbb5adceae98e7566dfbeb"
+    restart: "always"
+    ports:
+      - "18081:80"
+    environment:
+      - "PMA_HOST=mariadb-phpmyadmin-mariadb"
+      - "PMA_USER=appuser"
+      - "PMA_PASSWORD=demo-recipe-only-42"
+    depends_on:
+      - "mariadb-phpmyadmin-mariadb"
+  "mariadb-phpmyadmin-mariadb":
+    image: "mariadb:11.4.13@sha256:250e1609e93c0e6aecf64bfbab2d84d5e89d2481540fe77447ff6c855c3b1873"
+    restart: "always"
+    ports:
+      - "13307:3306"
+    volumes:
+      - "mariadb-phpmyadmin-mariadb-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+volumes:
+  "mariadb-phpmyadmin-mariadb-data":

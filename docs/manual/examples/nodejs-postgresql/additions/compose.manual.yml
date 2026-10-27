@@ -1,0 +1,7 @@
+services:
+  nodejs-postgresql-nodejs:
+    environment:
+      DB_HOST: nodejs-postgresql-postgres
+      DB_NAME: appdb
+      DB_USER: appuser
+      DB_PASSWORD: demo-recipe-only-42

@@ -2,10 +2,12 @@ name: Docker validation (v0.3.0)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [codex/appearance-theme-preview]
-  pull_request:
-    branches: [codex/appearance-theme-preview]
+    inputs:
+      suite:
+        description: Validation suite to run manually
+        type: choice
+        options: [manual-recipes, six-cases]
+        default: manual-recipes
 
 permissions:
   contents: read
@@ -15,7 +17,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  manual-recipes:
+    if: inputs.suite == 'manual-recipes'
+    uses: ./.github/workflows/manual-recipes-validation.yml
+
   docker-validation:
+    if: inputs.suite == 'six-cases'
     name: Generated Compose and Dockerfile (Ubuntu)
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -69,6 +76,7 @@ jobs:
           include-hidden-files: false
 
   electron-regression:
+    if: inputs.suite == 'six-cases'
     name: Existing Electron regression (Windows)
     runs-on: windows-2025
     timeout-minutes: 15

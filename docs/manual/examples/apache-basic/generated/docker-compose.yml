@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  "manual-apache-apache":
+    image: "httpd:2.4.69-alpine@sha256:070da7661f0be8a05430b2c125c0cde9e53176b4048c813024021969a0e3893c"
+    restart: "always"
+    ports:
+      - "19082:80"
+    volumes:
+      - "./fixture-web:/usr/local/apache2/htdocs/"

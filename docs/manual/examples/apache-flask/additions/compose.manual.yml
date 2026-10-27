@@ -1,0 +1,8 @@
+services:
+  apache-flask-flask:
+    environment: {}
+  apache-flask-apache:
+    volumes:
+      - ./config/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+    depends_on:
+      - apache-flask-flask

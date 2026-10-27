@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  "ollama-basic-ollama":
+    build:
+      context: "./ollama"
+      dockerfile: "Dockerfile.ollama"
+    entrypoint: []
+    restart: "always"
+    ports:
+      - "11434:11434"
+    volumes:
+      - "ollama-basic-ollama-data:/root/.ollama"
+    command: ["ollama","serve"]
+volumes:
+  "ollama-basic-ollama-data":
