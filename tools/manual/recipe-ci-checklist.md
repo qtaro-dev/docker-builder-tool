@@ -20,6 +20,8 @@
 
 ## 初回の検証側問題と再確認
 
+ワークフロー構文の変数スコープを修正する前に、GitHubが[構文エラーの記録40504632380](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40504632380)をpushイベントとして作成しています。この記録の実行ジョブは0件で、Dockerの自動検証は行われていません。実コンテナ検証の2回はいずれもworkflow_dispatchによる手動実行です。
+
 初回実行[40504798855](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40504798855)はOK25、FAIL4、NOT_RUN6でした。非同期処理の完了前終了を防ぐイベントループ保持、RabbitMQの検査キュー指定（durable）、WordPressの検査用インストール処理を修正し、全35件を同じ修正コミットで再実行しました。初回の記録は保持しています。アプリ本体や生成Compose/Dockerfileの不具合を検証側で隠す修正はしていません。
 
 ## 検証範囲

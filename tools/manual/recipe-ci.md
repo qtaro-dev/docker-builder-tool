@@ -69,3 +69,5 @@ npm test
 2026-10-28の確定結果：実Actions実行[40524380569](https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40524380569)、検証コミット`50d2e76095a6330783c817101635376d5bb89070`、35件OK・FAIL/BLOCKED/PARTIAL/NOT_RUN各0件。Dockerfileのビルド20件成功、既成イメージのみ15件は対象外。生成・準備・config・pull・起動・応答/連携・後片付けは各35件成功。Laravel 12.70.1のHTTPとMySQL/PostgreSQLへの書込・集計値42も成功。ローカル自動テストは検証側修正後52件成功（制御試験等13件を含む）。
 
 初回実行40504798855では25件OK・4件FAIL・6件NOT_RUNでした。検証プロセスの非同期完了待ち、RabbitMQ検査キューのdurable指定、WordPress検査用初期セットアップを修正し、同一コミットの全35件を再実行しました。アプリ本体・生成Compose/Dockerfileは修正していません。初回の失敗記録も削除していません。
+
+構文修正前のpushイベント失敗40504632380はGitHubの構文検査記録で、ジョブ0件・実Docker検証なしです。実コンテナ検証は上記2回のworkflow_dispatchだけです。現在のワークフローにはpush/PR起動条件がありません。
