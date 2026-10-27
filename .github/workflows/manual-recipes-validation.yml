@@ -41,8 +41,6 @@ jobs:
       # 一度に1グループ。次のジョブは新しいrunnerで開始する。
       max-parallel: 1
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
-    env:
-      MANUAL_RECIPE_ARTIFACTS: ${{ runner.temp }}/recipe-results
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -59,10 +57,14 @@ jobs:
           docker compose version
           pwsh --version
       - name: Build, start and test recipes
+        env:
+          MANUAL_RECIPE_ARTIFACTS: ${{ runner.temp }}/recipe-results
         run: node scripts/manual-recipes-validation.cjs --run ${{ matrix.batch }}
         timeout-minutes: 53
       - name: Cleanup only projects owned by this batch
         if: always()
+        env:
+          MANUAL_RECIPE_ARTIFACTS: ${{ runner.temp }}/recipe-results
         run: node scripts/manual-recipes-validation.cjs --cleanup
         timeout-minutes: 5
       - name: Preserve checklist and diagnostic evidence

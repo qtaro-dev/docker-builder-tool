@@ -103,6 +103,7 @@ test('workflow serializes six-entry batches, keeps read-only permissions and pre
   assert.match(text,/max-parallel: 1/);assert.match(text,/fail-fast: false/);assert.match(text,/contents: read/);assert.doesNotMatch(text,/secrets\.|pull_request_target|contents: write/);
   assert.match(text,/--cleanup/);assert.match(text,/--merge/);assert.match(text,/if: always/);
   const workflow=require('js-yaml').load(text);assert.equal(workflow.on.push,undefined);assert.equal(workflow.on.pull_request,undefined);assert.ok(Object.hasOwn(workflow.on,'workflow_dispatch'));
+  assert.equal(workflow.jobs.batches.env,undefined,'runner context must be used at step scope');
 });
 test('Laravel fixture uses actual pinned framework; missing installed dependencies cannot pass readiness',()=>temporary(dir=>{
   const recipe=plan.recipes.find(r=>r.id==='laravel-mysql');
