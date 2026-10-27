@@ -85,7 +85,8 @@ async function probe(context) {
     if(!listed.split(/\r?\n/).some(l=>l.startsWith('recipeuser\t'))) exec('rabbitmq','rabbitmqctl','add_user','recipeuser','demo-recipe-only-42');
     exec('rabbitmq','rabbitmqctl','set_user_tags','recipeuser','administrator');exec('rabbitmq','rabbitmqctl','set_permissions','-p','/','recipeuser','.*','.*','.*');
     const p=portOf(services[service('rabbitmq')],15672),headers={Authorization:'Basic '+Buffer.from('recipeuser:demo-recipe-only-42').toString('base64'),'Content-Type':'application/json'};
-    await http(p,'/api/queues/%2F/recipe-ci',{method:'PUT',headers,body:JSON.stringify({durable:false,auto_delete:false,arguments:{}}),expectedStatus:[201,204]});
+    // RabbitMQ 4.3では非durable・非exclusiveのキューが拒否される。永続キューでpublish/getを検査する。
+    await http(p,'/api/queues/%2F/recipe-ci',{method:'PUT',headers,body:JSON.stringify({durable:true,auto_delete:false,arguments:{}}),expectedStatus:[201,204]});
     await http(p,'/api/exchanges/%2F/amq.default/publish',{method:'POST',headers,body:JSON.stringify({properties:{},routing_key:'recipe-ci',payload:'42',payload_encoding:'string'}),json:r=>assert.equal(r.routed,true)});
     await http(p,'/api/queues/%2F/recipe-ci/get',{method:'POST',headers,body:JSON.stringify({count:1,ackmode:'ack_requeue_false',encoding:'auto',truncate:100}),json:r=>assert.equal(r[0]?.payload,'42')});
     evidence.push('RabbitMQ authenticated queue publish/get');
@@ -142,7 +143,8 @@ async function probe(context) {
     const wp=service('wordpress'),p=portOf(services[wp],80);
     // 初期セットアップをブラウザフォームの代わりにWordPress自身のAPIで行う。学習用ダミーのみ。
     const wpPort=recipe.modules.includes('nginx')?portOf(services[service('nginx')],80):p;
-    c(['exec','-T',wp,'php','-r',`$_SERVER['HTTP_HOST']='localhost:${wpPort}';$_SERVER['REQUEST_URI']='/';require '/var/www/html/wp-load.php';require_once ABSPATH.'wp-admin/includes/upgrade.php';if(!is_blog_installed()){wp_install('Recipe CI','recipeadmin','recipe@example.invalid',true,'','demo-recipe-only-42');}update_option('siteurl','http://localhost:${wpPort}');update_option('home','http://localhost:${wpPort}');if(!get_page_by_path('recipe-ci',OBJECT,'post')){wp_insert_post(['post_title'=>'Recipe CI marker','post_name'=>'recipe-ci','post_content'=>'recipe-ci-content-42','post_status'=>'publish']);}`],30000);
+    const installed=c(['exec','-T',wp,'php','-r',`define('WP_INSTALLING',true);$_SERVER['HTTP_HOST']='localhost:${wpPort}';$_SERVER['REQUEST_URI']='/';require '/var/www/html/wp-load.php';require_once ABSPATH.'wp-admin/includes/upgrade.php';if(!is_blog_installed()){wp_install('Recipe CI','recipeadmin','recipe@example.invalid',true,'','demo-recipe-only-42');}update_option('siteurl','http://localhost:${wpPort}');update_option('home','http://localhost:${wpPort}');if(!get_page_by_path('recipe-ci',OBJECT,'post')){wp_insert_post(['post_title'=>'Recipe CI marker','post_name'=>'recipe-ci','post_content'=>'recipe-ci-content-42','post_status'=>'publish']);}if(!get_page_by_path('recipe-ci',OBJECT,'post'))exit(1);echo 'recipe-ci-installed';`],30000);
+    assert.match(installed.stdout,/recipe-ci-installed/,'WordPress setup did not complete');
     const webCheck=()=>http(wpPort,'/?s=recipe-ci-content-42',{headers:{Host:`localhost:${wpPort}`},text:/Recipe CI marker/});
     await context.waitFor(webCheck,30000);
     evidence.push('WordPress install/post/query through configured HTTP→DB');

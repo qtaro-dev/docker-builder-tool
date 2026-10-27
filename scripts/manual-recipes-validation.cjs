@@ -6,6 +6,11 @@ const {prepare}=require('./lib/manual-recipe-generation.cjs');
 const {ready,probe}=require('./lib/manual-recipe-probes.cjs');
 const {classifyFailure}=require('./docker-validation.cjs');
 const states=['NOT_RUN','STATIC_ONLY','OK','FAIL','BLOCKED','PARTIAL'];
+// 未解決PromiseだけではNodeのイベントループを維持できない。HTTP待機中の無言終了を防ぐ。
+function holdEventLoop(task) {
+  const heartbeat=setInterval(()=>{},1000);
+  return Promise.resolve().then(task).finally(()=>clearInterval(heartbeat));
+}
 const safeEnv=extra=>Object.fromEntries([...['PATH','Path','HOME','SystemRoot','TEMP','TMP','TMPDIR'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]),...Object.entries(extra||{})]);
 function command(executable,args,directory,log,timeout,extra={}) {
   fs.appendFileSync(log,`$ ${executable} ${JSON.stringify(args)}\n`);
@@ -58,20 +63,20 @@ function runtime(record,recipe,generated,directory,destination,token,index,invok
   const emptyEnv=path.join(path.dirname(directory),'empty.env');fs.writeFileSync(emptyEnv,'');
   const project=`dbtm-${token}-${index}-main`,restore=`dbtm-${token}-${index}-restore`;
   const composeFiles=['docker-compose.yml',...(generated.additions.includes('compose.manual.yml')?['compose.manual.yml']:[])].map(name=>({name,sha256:hash(path.join(directory,name))}));
-  const owned={directory,config,emptyEnv,project,restore,restoreUsed:false,lockContainer:`${project}-lock`,composeFiles,log:path.join(directory,'cleanup.log')};
-  fs.writeFileSync(path.join(directory,'ownership.json'),JSON.stringify(owned,null,2));
   const exported=path.join(destination,recipe.id);fs.mkdirSync(exported,{recursive:true});
+  const owned={directory,config,emptyEnv,project,restore,restoreUsed:false,lockContainer:`${project}-lock`,composeFiles,log:path.join(exported,'cleanup.log')};
+  fs.writeFileSync(path.join(directory,'ownership.json'),JSON.stringify(owned,null,2));
   fs.writeFileSync(path.join(exported,'ownership.json'),JSON.stringify(owned,null,2));
   const dockerEnv={DOCKER_CONFIG:config,DOCKER_BUILDKIT:'1',BUILDKIT_PROGRESS:'plain'};
-  const compose=(tail,timeout=60000)=>invoke('docker',[...ownedArgs(owned),...tail],directory,path.join(directory,'docker.log'),timeout,dockerEnv);
+  const compose=(tail,timeout=60000)=>invoke('docker',[...ownedArgs(owned),...tail],directory,path.join(exported,'docker.log'),timeout,dockerEnv);
   return {recipe,record,project,owned,compose,directory,generated,waitFor,
     restore:(tail,timeout)=>{
       // 中断直後のalways処理でも復旧用プロジェクトを取り残さないよう、起動前に記録する。
       owned.restoreUsed=true;
       for(const target of [directory,exported])fs.writeFileSync(path.join(target,'ownership.json'),JSON.stringify(owned,null,2));
-      return invoke('docker',[...ownedArgs(owned,restore),...tail],directory,path.join(directory,'restore.log'),timeout,dockerEnv);
+      return invoke('docker',[...ownedArgs(owned,restore),...tail],directory,path.join(exported,'restore.log'),timeout,dockerEnv);
     },
-    command:(name,args,timeout,extra)=>invoke(name,args,directory,path.join(directory,'extras.log'),timeout,{...dockerEnv,...extra}),
+    command:(name,args,timeout,extra)=>invoke(name,args,directory,path.join(exported,'extras.log'),timeout,{...dockerEnv,...extra}),
   };
 }
 async function execute(context) {
@@ -191,7 +196,7 @@ async function main(args) {
   }
   assert.ok(['--static','--run'].includes(args[0]));const n=Number(args[1]);plan.batch(n);
   const rows=await run({mode:args[0]==='--run'?'docker':'static',batch:n,destination});
-  if(rows.some(r=>r.batch===n&&['FAIL','BLOCKED','PARTIAL'].includes(r.status)))process.exitCode=1;
+  if(rows.some(r=>r.batch===n&& ![args[0]==='--run'?'OK':'STATIC_ONLY'].includes(r.status)))process.exitCode=1;
 }
-module.exports={initial,markdown,save,run,merge,cleanup,cleanupSaved,ownedArgs,command,main};
-if(require.main===module)main(process.argv.slice(2)).catch(e=>{console.error(e);process.exitCode=1;});
+module.exports={initial,markdown,save,run,merge,cleanup,cleanupSaved,ownedArgs,command,main,holdEventLoop};
+if(require.main===module)holdEventLoop(()=>main(process.argv.slice(2))).catch(e=>{console.error(e);process.exitCode=1;});

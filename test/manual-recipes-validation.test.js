@@ -115,3 +115,22 @@ test('Laravel fixture uses actual pinned framework; missing installed dependenci
   assert.ok(prepared.ciFixture.includes('laravel/routes/web.php'));
   assert.ok(prepared.generated.includes('laravel/Dockerfile.laravel'));
 }));
+test('operator CLI holds the event loop until an unreferenced asynchronous timer completes',()=>{
+  const code=`require(${JSON.stringify(path.join(plan.root,'scripts/manual-recipes-validation.cjs'))}).holdEventLoop(async()=>{await new Promise(r=>setTimeout(r,30).unref());process.stdout.write('ASYNC_COMPLETED');})`;
+  const result=require('node:child_process').spawnSync(process.execPath,['-e',code],{encoding:'utf8',timeout:5000});
+  assert.equal(result.status,0);assert.equal(result.stdout,'ASYNC_COMPLETED');
+});
+test('RabbitMQ probe uses durable queue and actually checks publish and consumed payload (loopback simulation)',async()=>{
+  const seen=[];
+  const server=require('node:http').createServer(async(req,res)=>{
+    let body='';for await(const chunk of req)body+=chunk;const data=JSON.parse(body);seen.push(req.url);
+    assert.match(req.headers.authorization,/^Basic /);
+    if(req.method==='PUT'){assert.equal(data.durable,true);res.writeHead(201);res.end();}
+    else if(req.url.endsWith('/publish')){assert.equal(data.payload,'42');res.end('{"routed":true}');}
+    else {assert.equal(data.ackmode,'ack_requeue_false');res.end('[{"payload":"42"}]');}
+  });await new Promise(r=>server.listen(0,'127.0.0.1',r));
+  try {
+    const result=await require('../scripts/lib/manual-recipe-probes.cjs').probe({recipe:{id:'rabbitmq-basic',modules:['rabbitmq']},services:{'rabbitmq-basic-rabbitmq':{ports:[{target:15672,published:String(server.address().port)}]}},compose:args=>({stdout:args.includes('ps')?'[{"Service":"rabbitmq-basic-rabbitmq","State":"running"}]':args.includes('list_users')?'recipeuser\t[administrator]':''})});
+    assert.equal(seen.length,3);assert.match(result.evidence[0],/publish\/get/);
+  }finally{await new Promise(r=>server.close(r));}
+});
