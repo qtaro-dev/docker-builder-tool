@@ -1,3 +1,4 @@
+// 既存生成試験の前提として、入力後に実UIの「設定確認」を明示操作する。
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -22,12 +23,12 @@ module.exports = async ({ run, until, wc, win }) => {
     series.value = '22'; series.dispatchEvent(new Event('change'));
     const form = document.querySelector('[data-module-id=nodejs] .image-variant');
     form.value = [...form.options].find(o => o.textContent.startsWith('alpine ')).value; form.dispatchEvent(new Event('change'));
-    window.__rendererGenerate.generateConfigs();`);
+    window.__testConfirmModules(); window.__rendererGenerate.generateConfigs();`);
   assert.match(await run('document.getElementById("dockerfileOutput").value'), /FROM node:22\..*-alpine/);
   assert.match(await run('document.getElementById("composeOutput").value'), /working_dir: "\/app"/);
   assert.match(await run('document.getElementById("composeOutput").value'), /dockerfile: "Dockerfile.python-web"/);
   assert.match(await run('document.getElementById("composeOutput").value'), /flask run --host=0.0.0.0 --port=5000/);
-  assert.equal(await run('document.getElementById("generatedFileSelect").options.length'), 4);
+  assert.equal(await run('document.getElementById("generatedFileSelect").options.length'), 9);
   await run(String.raw`document.getElementById('dockerfileOutput').value += '\n# retained edit';
     const files = document.getElementById('generatedFileSelect'); files.value = '2'; files.dispatchEvent(new Event('change'));`);
   assert.match(await run('document.getElementById("dockerfileOutput").value'), /FROM python:/);
@@ -55,19 +56,19 @@ module.exports = async ({ run, until, wc, win }) => {
     window.__savedVersion = window.ImageUI.selected('nodejs');
     const oldSeries = document.querySelector('[data-module-id=nodejs] .image-series');
     oldSeries.value = '20'; oldSeries.dispatchEvent(new Event('change'));
-    window.confirm = () => false; window.__rendererGenerate.generateConfigs();`);
+    window.confirm = () => false; window.__testConfirmModules(); window.__rendererGenerate.generateConfigs();`);
   assert.equal(await run('document.getElementById("composeOutput").value'), "");
   assert.match(await run('document.getElementById("portMessage").textContent'), /通常生成を制限/);
   assert.match(await run('document.querySelector("[data-module-id=nodejs] .image-status").textContent'), /EOL/);
   assert.equal(await run('document.querySelector("[data-module-id=nodejs] .image-details").open'), false);
-  await run("window.confirm = () => true; window.__rendererGenerate.generateConfigs()");
+  await run("window.confirm = () => true; window.__testConfirmModules(); window.__rendererGenerate.generateConfigs()");
   assert.match(await run('document.getElementById("dockerfileOutput").value'), /FROM node:20\./);
   assert.match(await run('document.getElementById("guideSecurity").textContent'), /検証目的の例外/);
   await run(`window.ImageUI.selections.set('nodejs', {...window.__savedVersion, tag:'nonexistent'});
     window.confirm = () => { throw new Error('Unknown tags must not have an exception'); };
-    window.__rendererGenerate.generateConfigs();`);
+    window.__testConfirmModules(); window.__rendererGenerate.generateConfigs();`);
   assert.equal(await run('document.getElementById("composeOutput").value'), "");
-  await run("window.ImageUI.selections.set('nodejs',window.__savedVersion); window.confirm = window.__savedConfirm; window.__rendererGenerate.generateConfigs()");
+  await run("window.ImageUI.selections.set('nodejs',window.__savedVersion); window.confirm = window.__savedConfirm; window.__testConfirmModules(); window.__rendererGenerate.generateConfigs()");
   console.log("PASS Electron EOL reject/one-generation exception and unknown-tag rejection without exception");
 
   // 通信のOS境界だけを置き換え、main/preload/UI/検証/実キャッシュを通す。
@@ -103,7 +104,7 @@ module.exports = async ({ run, until, wc, win }) => {
     await until("document.getElementById('imageCatalogStatus').textContent.includes('更新失敗')");
     assert.deepEqual(fs.readFileSync(cachePath), bytes);
     assert.equal(await run("window.ImageUI.selected('nodejs').image"), before);
-    await run("window.__rendererGenerate.generateConfigs()");
+    await run("window.__testConfirmModules(); window.__rendererGenerate.generateConfigs()");
     assert.match(await run('document.getElementById("composeOutput").value'), /9137:80/);
   } finally { https.get = original; }
   console.log("PASS Electron online update, offline failure preserves userData cache, selected version and other inputs");

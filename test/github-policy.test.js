@@ -41,7 +41,7 @@ test('settings schema cannot accept GitHub credentials or workflow configuration
   assert.deepEqual(validateSettings({ theme: 'dark', paths: { composeDir: 'project' } }), { theme: 'dark', paths: { composeDir: 'project' } });
 });
 
-test('preload exposes only existing local operations and Docker Hub update without caller URL/auth', async () => {
+test('preload exposes local operations, fixed About page and Docker Hub update without caller URL/auth', async () => {
   let api;
   const calls = [];
   vm.runInNewContext(fs.readFileSync(require.resolve('../preload'), 'utf8'), {
@@ -51,9 +51,10 @@ test('preload exposes only existing local operations and Docker Hub update witho
     }),
   });
   assert.deepEqual(Object.keys(api).sort(), [
-    'getVersion', 'getImageCatalog', 'updateImageCatalog', 'getSettings', 'saveSettings', 'getSettingsPath',
-    'isDirectory', 'initializeProjectPaths', 'pickDirectory', 'writeLog', 'saveGeneratedFile', 'onMenuCommand',
+    'getVersion', 'getAboutInfo', 'openProjectPage', 'getImageCatalog', 'updateImageCatalog', 'getSettings', 'saveSettings', 'getSettingsPath',
+    'isDirectory', 'initializeProjectPaths', 'pickDirectory', 'writeLog', 'saveGeneratedFile', 'saveGeneratedBundle', 'onMenuCommand',
   ].sort());
   await api.updateImageCatalog('https://api.github.com', { token: 'policy-test-placeholder' });
-  assert.deepEqual(calls, [['images:update']]);
+  await api.openProjectPage('https://evil.invalid', { token: 'policy-test-placeholder' });
+  assert.deepEqual(calls, [['images:update'], ['about:openProjectPage']]);
 });

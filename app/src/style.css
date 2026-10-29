@@ -1,3 +1,7 @@
+/* Web追加設定も既存のテーマ変数に追従する。 */
+.module-advanced-settings { margin-top: 16px; padding: 12px; border: 1px solid var(--theme-border); border-radius: 8px; }
+.module-advanced-settings > summary { cursor: pointer; font-weight: 600; color: var(--theme-text); }
+.module-advanced-settings[open] > summary { margin-bottom: 12px; }
 /* 既存テーマの配色を共通変数へ集約。カードとプレビューも同じ値を使う。 */
 :root, [data-palette] {
   --theme-page: #f5f5f7;
@@ -8,8 +12,12 @@
   --theme-border: #ddd;
   --theme-accent: #0078d7;
   --theme-action: #0078d7;
+  --module-selected-bg: #e8e8e8;
+  --module-selected-border: #555555;
 }
 html[data-theme="dark"], [data-palette="dark"] {
+  --module-selected-bg: #263a54;
+  --module-selected-border: #60a5fa;
   --theme-page: #121212;
   --theme-header: #1e1e1e;
   --theme-border: #333;
@@ -20,36 +28,48 @@ html[data-theme="dark"], [data-palette="dark"] {
   --theme-action: #0050aa;
 }
 html[data-theme="blue"], [data-palette="blue"] {
+  --module-selected-bg: #e0edff;
+  --module-selected-border: #2563eb;
   --theme-page: #f2f7ff;
   --theme-header: #e8f1ff;
   --theme-border: #9fc0f0;
   --theme-accent: #2563eb;
 }
 html[data-theme="green"], [data-palette="green"] {
+  --module-selected-bg: #e0f5e7;
+  --module-selected-border: #198754;
   --theme-page: #f2fbf5;
   --theme-header: #e6f6ec;
   --theme-border: #86d3a0;
   --theme-accent: #16a34a;
 }
 html[data-theme="yellow"], [data-palette="yellow"] {
+  --module-selected-bg: #fff2b3;
+  --module-selected-border: #c58a00;
   --theme-page: #fffbea;
   --theme-header: #fff3c4;
   --theme-border: #facc15;
   --theme-accent: #ca8a04;
 }
 html[data-theme="orange"], [data-palette="orange"] {
+  --module-selected-bg: #fff0d6;
+  --module-selected-border: #c86416;
   --theme-page: #fff7ed;
   --theme-header: #ffedd5;
   --theme-border: #fdba74;
   --theme-accent: #ea580c;
 }
 html[data-theme="red"], [data-palette="red"] {
+  --module-selected-bg: #ffe5e5;
+  --module-selected-border: #dc3545;
   --theme-page: #fff5f5;
   --theme-header: #fee2e2;
   --theme-border: #fca5a5;
   --theme-accent: #dc2626;
 }
 html[data-theme="pink"], [data-palette="pink"] {
+  --module-selected-bg: #ffe5f0;
+  --module-selected-border: #d63384;
   --theme-page: #fff1f6;
   --theme-header: #ffe4ee;
   --theme-border: #f9a8d4;
@@ -97,6 +117,7 @@ body {
 
 /* 入力共通（アプリ全体） */
 input[type="text"],
+input[type="password"],
 input[type="number"],
 textarea {
   font-family: inherit;
@@ -254,10 +275,11 @@ textarea {
   background-color: #f9fafb;
 }
 
-/* 選択中行 */
-.module-row.is-selected {
-  background-color: #fffbeb;
-}
+/* 自動テーマも共通の実効テーマ変数を使い、選択を維持したまま配色だけを更新する。 */
+html .module-row.is-selected { background-color: var(--module-selected-bg); color: var(--theme-text); }
+html[data-theme] .module-row.is-selected:hover { background-color: color-mix(in srgb, var(--module-selected-bg) 88%, var(--theme-surface)); }
+html .module-row.is-selected .module-name { color: var(--theme-text); }
+html .module-row.is-selected .module-desc { color: var(--theme-muted); }
 
 .module-label-cell {
   display: flex;
@@ -265,19 +287,22 @@ textarea {
   gap: 10px;
 }
 
+/* 透明枠を常設し、選択・解除・テーマ変更による寸法と文字位置の変化を防ぐ。 */
 .module-icon-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  box-sizing: border-box;
+  flex: 0 0 66px;
+  width: 66px;
+  height: 66px;
   border-radius: 6px;
-  border: 1px solid transparent;
+  border: 3px solid transparent;
 }
 
-.module-row.is-selected .module-icon-wrapper {
-  border-color: #fbbf24;
-  background-color: #fffbeb;
+html .module-row.is-selected .module-icon-wrapper {
+  border-color: var(--module-selected-border);
+  background-color: var(--theme-surface);
 }
 
 .module-icon {
@@ -603,15 +628,34 @@ button {
     "Liberation Mono", "Courier New", monospace;
 }
 
-/* 生成結果タブ：docker-compose / Dockerfile を「上下 2 ペイン」で常時見えるようにする */
+/* 生成結果だけをビューポート内のFlex領域にする。他タブは従来の文書スクロール。 */
+body:has(#tab-output.active) {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+body:has(#tab-output.active) .app-header { flex: 0 0 auto; }
+body:has(#tab-output.active) .app-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+body:has(#tab-output.active) .tabs { flex: 0 0 auto; }
 #tab-output.tab-content.active {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 140px);
+  flex: 1;
+  min-height: 0;
+  gap: 10px;
 }
 
 #tab-output .output-split {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: row;
@@ -620,6 +664,7 @@ button {
 
 #tab-output .output-split .card {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   margin-bottom: 0;
   display: flex;
@@ -631,9 +676,17 @@ button {
 }
 
 #tab-output .output-split .card textarea {
-  flex: 1;
+  flex: 1 1 0;
+  height: auto;
   min-height: 0;
+  overflow: auto;
 }
+#tab-output .output-split .card > :not(textarea) { flex-shrink: 0; }
+#tab-output > .button-row { flex: 0 0 auto; margin: 0; }
+#tab-output #generatedFileSelect { min-width: 0; max-width: 100%; }
+#tab-output #generatedFilePath { margin: 6px 0; }
+#tab-output #generatedSaveStatus { max-height: 4.5em; overflow-y: auto; margin: 6px 0 0; }
+#tab-output #generatedSaveStatus:empty { display: none; }
 
 
 /* =========================================
@@ -890,16 +943,8 @@ html[data-theme="dark"] .module-row:hover {
   background-color: #1f2933;
 }
 
-html[data-theme="dark"] .module-row.is-selected {
-  background-color: #1f2933;
-}
-
-html[data-theme="dark"] .module-row.is-selected .module-icon-wrapper {
-  background-color: #1f2933;
-  border-color: #facc15;
-}
-
 html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="password"],
 html[data-theme="dark"] input[type="number"],
 html[data-theme="dark"] textarea {
   background-color: #222;
@@ -1164,7 +1209,7 @@ html[data-theme="pink"] .generate-separator {
 /* Keep validation messages readable without interpreting input as HTML. */
 .generate-message { white-space: pre-line; }
 
-/* 外観設定：スクロールは本文内に収め、保存・キャンセルは常に操作できる。 */
+/* 外観設定：スクロールは本文内に収め、保存・閉じるは常に操作できる。 */
 .settings-dialog { min-height: 0; background: var(--theme-surface); color: var(--theme-text); }
 html .settings-dialog .settings-nav { background: var(--theme-header); border-color: var(--theme-border); }
 html .settings-dialog .settings-nav-item { color: var(--theme-text); }
@@ -1199,15 +1244,6 @@ html .settings-dialog .settings-nav-item.active { background: var(--theme-page);
 .settings-appearance-actions { margin: 12px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
 .settings-appearance-actions .primary-button { font-size: 13px; }
 #settingsThemeStatus { margin: 0; font-size: 12px; color: var(--theme-muted); }
-.settings-theme-preview { border: 1px solid var(--theme-border); border-radius: 8px; overflow: hidden; background: var(--theme-page); }
-.settings-theme-preview h4 { margin: 0; padding: 6px 10px; font-size: 12px; font-weight: 500; color: var(--theme-muted); }
-.settings-preview-header { padding: 6px 10px; background: var(--theme-header); color: var(--theme-text); font-size: 12px; font-weight: 600; }
-.settings-preview-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--theme-border); padding: 0 8px; }
-.settings-preview-tab { padding: 5px 6px; color: var(--theme-muted); font-size: 11px; }
-.settings-preview-tab.active { color: var(--theme-text); border-bottom: 2px solid var(--theme-accent); }
-.settings-preview-body { padding: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.settings-preview-card { flex: 1; padding: 8px; border: 1px solid var(--theme-border); border-radius: 5px; background: var(--theme-surface); font-size: 12px; }
-.settings-preview-button { padding: 5px 9px; border: 1px solid var(--theme-accent); border-radius: 4px; background: var(--theme-action); color: #fff; font-size: 11px; }
 /* メッセージ2行分を常に確保し、表示時に本文を縮めたりスクロールを増やさない。 */
 .settings-save-error { flex-shrink: 0; min-height: 2.8em; line-height: 1.4; margin: 8px 0 0; font-size: 13px; font-weight: 600; color: var(--theme-text); white-space: pre-line; }
 .settings-save-error[hidden] { display: block; visibility: hidden; }
@@ -1234,8 +1270,6 @@ html .settings-dialog .settings-nav-item.active { background: var(--theme-page);
 .image-version-panel select, #generatedFileSelect { color: var(--theme-text); background: var(--theme-surface); border: 1px solid var(--theme-border); padding: 5px; border-radius: 4px; }
 .image-tag { display: block; overflow-wrap: anywhere; }
 .image-status, #generatedPlacementGuide, #generatedFilePath, #generatedSaveStatus { white-space: pre-wrap; overflow-wrap: anywhere; }
-#tab-output.active { height: auto; min-height: calc(100vh - 140px); }
-#tab-output .output-split { flex: 0 0 auto; min-height: 440px; }
 .image-version-panel { font-size: 14px; }
 .image-version-panel select { min-width: 140px; font-size: 14px; }
 .image-details summary { cursor: pointer; padding: 6px 0; }
@@ -1259,6 +1293,71 @@ html .settings-dialog .settings-nav-item.active { background: var(--theme-page);
 .guide-footer { display: flex; justify-content: flex-end; border-top: 1px solid var(--theme-border); }
 .guide-footer button { padding: 6px 18px; background: var(--theme-surface); color: var(--theme-text); border: 1px solid var(--theme-border); border-radius: 6px; font-size: 14px; }
 @media (max-width: 760px) {
-  #tab-output .output-split { flex-direction: column; }
+  #tab-output .output-split { flex-direction: column; overflow-y: auto; }
   #tab-output .output-split .card { min-height: 320px; }
+}
+/* モジュール設定の開閉と確認。テーマ色を共用し、入力領域のDOMは保持する。 */
+.module-panel-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.card .module-panel-heading{margin:0;flex:1;min-width:0}
+.module-panel-toggle{display:flex;align-items:center;gap:12px;width:100%;padding:4px 0;border:0;background:transparent;color:var(--theme-text);text-align:left;font:inherit;cursor:pointer}
+.module-panel-icon{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.module-panel-name{font-size:20px;font-weight:700;overflow-wrap:anywhere}
+.module-panel-arrow{margin-left:auto;font-size:22px;flex-shrink:0}
+.module-panel-body{margin-top:18px}.module-panel-body[hidden]{display:none}
+.module-review-label{display:flex;align-items:center;gap:7px;flex-shrink:0;font-size:13px;cursor:pointer;color:var(--theme-text)}
+.module-review-checkbox{width:17px;height:17px;accent-color:var(--theme-accent)}
+.module-review-status{padding:3px 8px;border:1px solid var(--theme-border);border-radius:5px;background:var(--theme-page);font-weight:700}
+.module-review-status[data-confirmed="true"]{background:var(--theme-header);border-color:var(--theme-accent)}
+.secret-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-top:6px}
+.secret-controls label{display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer}
+.secret-copy-status{font-size:12px;overflow-wrap:anywhere}
+.module-panel-toggle:focus-visible,.module-review-checkbox:focus-visible,.secret-controls :focus-visible{outline:2px solid var(--theme-accent);outline-offset:3px}
+/* 未確認時も文字を読みやすくし、通常の実行色と区別する。 */
+#generateButton:disabled{background-color:#b42336;border-color:#b42336;color:#fff;opacity:1;cursor:not-allowed}
+@media(max-width:680px){.module-panel-header{gap:10px;flex-wrap:wrap}.module-panel-heading{flex-basis:100%}.module-review-label{margin-left:48px}.module-panel-name{font-size:18px}.module-panel-icon{width:30px;height:30px}}
+#configSections .field-row>label{font-size:13px}
+.secret-copy{padding:4px 10px;border:1px solid var(--theme-border);border-radius:5px;background:var(--theme-surface);color:var(--theme-text);cursor:pointer}
+.secret-copy:disabled{opacity:.55;cursor:not-allowed}
+
+/* フォルダ設定の問題箇所は配色だけに頼らず、枠線と説明で示す。 */
+.settings-dialog input[aria-invalid="true"] { outline: 2px solid #c62828; outline-offset: 1px; }
+html[data-theme="dark"] .settings-dialog input[aria-invalid="true"] { outline-color: #ff8a80; }
+html[data-theme="dark"] .settings-dialog .field-hint.error { color: #ff8a80; }
+/* About専用：テーマ変数を再利用し、他のダイアログの寸法や動作には影響させない。 */
+html[data-theme] .app-dialog.about-dialog {
+  width: min(600px, calc(100vw - 32px));
+  min-height: 0;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+  border-radius: 12px;
+}
+.about-content { max-height: calc(100vh - 34px); overflow-y: auto; }
+.about-hero { display: flex; flex-direction: column; align-items: center; padding: 16px 24px 14px; background: var(--theme-page); text-align: center; border-bottom: 1px solid var(--theme-border); }
+.about-illustration { display: block; width: auto; height: clamp(140px, 28vh, 216px); max-width: 100%; object-fit: contain; flex-shrink: 0; }
+.about-hero h2 { margin: 6px 0 2px; font-size: 25px; line-height: 1.25; }
+.about-subtitle { margin: 0; font-size: 14px; color: var(--theme-muted); }
+.about-version-badge { margin-top: 8px; padding: 3px 12px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text); font-size: 12px; font-weight: 600; }
+.about-information { padding: 14px 24px 0; font-size: 14px; line-height: 1.6; }
+#aboutDescription { margin: 0 0 12px; }
+.about-details { margin: 0; }
+.about-details > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; margin: 7px 0; }
+.about-details dt { font-weight: 600; color: var(--theme-muted); }
+.about-details dd { margin: 0; overflow-wrap: anywhere; }
+.about-details a { color: var(--theme-text); text-decoration: underline; text-underline-offset: 3px; font-size: 13px; }
+.about-details a:hover { text-decoration-thickness: 2px; }
+.about-link-note, .about-log-path { display: block; font-size: 12px; color: var(--theme-muted); }
+.about-link-status { margin: 0; font-size: 13px; color: var(--theme-text); }
+.about-link-status:not(:empty) { margin-top: 8px; }
+.about-footer { display: flex; justify-content: flex-end; padding: 12px 24px 16px; }
+.about-footer button { padding: 6px 18px; border: 1px solid var(--theme-border); border-radius: 6px; background: var(--theme-header); color: var(--theme-text); cursor: pointer; }
+.about-footer button:hover { background: var(--theme-page); border-color: var(--theme-accent); }
+.about-dialog :focus-visible { outline: 2px solid var(--theme-accent); outline-offset: 3px; }
+@media (max-width: 480px) {
+  .about-hero, .about-information { padding-left: 16px; padding-right: 16px; }
+  .about-details > div { grid-template-columns: 1fr; gap: 0; }
+  .about-hero h2 { font-size: 22px; }
 }

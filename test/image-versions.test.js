@@ -72,7 +72,7 @@ test("every candidate reaches Compose image or matching service FROM/build witho
     assert.deepEqual(output.errors, [], choice.image);
     const svc = output.services.find(s => s.name.includes(mod.id === "python-web" ? "django" : mod.id));
     assert.ok(svc, mod.id);
-    if (generation.buildModules.includes(mod.id)) {
+    if (svc.build) {
       assert.equal(svc.image, undefined);
       assert.equal(svc.build.context, `./${mod.id}`);
       const file = output.files.find(f => f.filename === svc.build.dockerfile);
@@ -82,8 +82,8 @@ test("every candidate reaches Compose image or matching service FROM/build witho
     } else assert.equal(svc.image, choice.image);
   }
   const multiple = make(["nginx", "nodejs", "python-web"]);
-  assert.equal(multiple.files.filter(f => f.filename.endsWith(".dockerignore")).length, 2);
-  assert.equal(new Set(multiple.files.map(f => f.relativePath)).size, 4);
+  assert.equal(multiple.files.filter(f => f.filename.endsWith(".dockerignore")).length, 3);
+  assert.equal(new Set(multiple.files.map(f => f.relativePath)).size, 9);
 });
 
 test("Laravel uses PHP CLI HTTP8000, locked Composer, extensions, runtime env and ignore file", () => {
@@ -267,15 +267,15 @@ test("guide matches generated files, context, versions and modes without claimin
   assert.ok(guide.placement.some(p => p.includes("build.context = ./nodejs")));
   assert.ok(guide.startup.some(step => step.command === "docker compose config -q"));
   assert.ok(guide.startup.some(step => step.command === "docker compose up --build -d"));
-  assert.ok(guide.security.some(p => p.includes("リバースプロキシ設定は自動生成しません")));
+  assert.ok(guide.security.some(p => p.includes("リバースプロキシはOFF")));
   assert.ok(guide.security.some(p => p.includes(output.images.find(e => e.moduleId === "nodejs").image)));
   assert.ok(guide.security.some(p => p.includes("未検査")));
   assert.ok(guide.security.some(p => p.includes("3000:3000")));
   assert.ok(guide.startup.some(step => step.command === "docker compose stop"));
   const next = guideModel.build(make(["nginx"]), "next");
   assert.doesNotMatch(next.tree, /nodejs|package-lock/);
-  assert.ok(next.startup.some(step => step.command === "docker compose up -d"));
-  assert.equal(next.startup.some(step => step.command?.includes("--build")), false);
+  assert.ok(next.startup.some(step => step.command === "docker compose up --build -d"));
+  assert.ok(next.tree.includes("html/index.html"));
   const certbot = guideModel.build(make(["certbot"], { certbot: { domain: "example.invalid" } }), "test");
   assert.ok(certbot.startup.some(step => step.command === "docker compose run --rm test-certbot"));
 });

@@ -17,11 +17,11 @@
       const last = index === directories.length - 1;
       const prefix = last ? "   " : "│  ";
       tree.push(`${last ? "└" : "├"}─ ${id}/`);
-      const children = [...output.files.filter(f => f.moduleId === id).map(f => f.filename), ...(sources[id] || [])];
+      const children = [...output.files.filter(f => f.moduleId === id).map(f => f.relativePath.startsWith(id+'/') ? f.relativePath.slice(id.length+1) : '../'+f.relativePath), ...(sources[id] || [])];
       children.forEach((child, n) => tree.push(`${prefix}${n === children.length - 1 ? "└" : "├"}─ ${child}`));
     });
     const placement = [
-      "docker-compose.ymlをプロジェクト用フォルダに保存し、その下へ必要なサブフォルダを作って各ファイルを個別保存してください。ZIP出力・一括保存は行いません。",
+      "「生成ファイル一式を保存」で新規サブフォルダへ相対パスを維持して保存できます。個別保存する場合は、各ファイルに表示された相対パスどおりに配置してください。利用者が準備するアプリ・依存ファイルは別途必要です。",
       ...output.services.filter(s => s.build).map(s => `${s.name}：build.context = ${s.build.context}（Composeからの相対パス）、build.dockerfile = ${s.build.dockerfile}（context内のファイル名）。専用dockerignoreも同じcontext内の ${s.build.dockerfile}.dockerignore に保存します。`),
       ...directories.filter(id => sources[id]).map(id => generation.requirements[id]),
     ];

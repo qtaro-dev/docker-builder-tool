@@ -5,7 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function load() {
-  const window = {};
+  const window = {ProjectGeneration:require('../app/src/project-generation')};
   const modules = [];
   const context = vm.createContext({ window, registerModule: m => modules.push(m) });
   for (const file of fs.readdirSync(path.join(__dirname, "../app/src/modules"))) {

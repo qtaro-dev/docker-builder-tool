@@ -1,9 +1,10 @@
 /* バージョン選択とサービス別の生成物を一緒に組み立て、FROM/buildの食い違いを防ぐ。 */
 (function (root, factory) {
-  const api = factory(typeof module === "object" && module.exports ? require("./image-versions") : root.ImageVersions);
+  const api = factory(typeof module === "object" && module.exports ? require("./image-versions") : root.ImageVersions,
+    typeof module === "object" && module.exports ? require("./module-assets") : root.ModuleAssets);
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.ProjectGeneration = api;
-})(typeof window === "object" ? window : globalThis, function (versions) {
+})(typeof window === "object" ? window : globalThis, function (versions, assets) {
   "use strict";
   const buildModules = ["nodejs", "python-web", "laravel", "jenkins", "ollama"];
   const requirements = {
@@ -146,7 +147,7 @@
       (partial.volumes || []).forEach(v => volumes.add(v));
     }
     if (allowUnsafe) warnings.unshift("検証目的の例外を使用しました。EOL/既知High・Criticalの構成を本番へ公開しないでください。");
-    if (modules.some(m => ["nginx", "apache"].includes(m.id)) && modules.some(m => ["nodejs", "python-web", "laravel"].includes(m.id))) notes.push("Nginx/Apacheとのリバースプロキシ設定は自動生成しません。HTTP upstreamをサービス名と内部ポートに合わせて別途設定してください。PHP-FPMは使用していません。");
+    assets.apply({modules, configs, projectName, selected, services, files, volumes, notes, errors});
     if (modules.some(m => m.id === "certbot")) {
       if (!cfgFor("certbot").domains?.trim() && !cfgFor("certbot").domain?.trim()) errors.push("Certbot：証明書を取得するドメインを入力してください。");
       notes.push("Certbot：Webサーバとchallenge用webroot・証明書を共有し、ドメインと外部80番到達性、更新/reloadを設定してください。取得・更新は自動実行しません。");
@@ -155,5 +156,5 @@
     return { errors, warnings, files, services, volumes, notes,
       images: [...selected.values(), ...(modules.some(m => m.id === "laravel") && composer ? [composer] : [])] };
   }
-  return { build, dockerfile, buildModules, requirements, nodeCommand, nodeAdvice };
+  return { build, dockerfile, buildModules, requirements, nodeCommand, nodeAdvice, webFields:assets.fields, httpPorts:assets.httpPorts, httpPort:assets.httpPort };
 });

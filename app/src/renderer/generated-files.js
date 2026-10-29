@@ -8,7 +8,7 @@ function display(index) {
   currentIndex = index;
   const file = files[index];
   document.getElementById("dockerfileOutput").value = file?.content || "";
-  document.getElementById("generatedFilePath").textContent = file ? `Compose配置フォルダからの相対パス：${file.relativePath}` : "この構成にDockerfileはありません。";
+  document.getElementById("generatedFilePath").textContent = file ? `Compose配置フォルダからの相対パス：${file.relativePath}` : "この構成に追加生成ファイルはありません。";
   document.getElementById("dockerfileDownloadBtn").disabled = !file;
 }
 function set(next) {
@@ -28,4 +28,4 @@ function isEdited() {
 function bind() {
   document.getElementById("generatedFileSelect").addEventListener("change", event => { remember(); display(Number(event.target.value)); });
 }
-window.GeneratedFiles = { set, bind, isEdited, current: () => { remember(); return files[currentIndex]; } };
+window.GeneratedFiles = { set, bind, isEdited, all: () => { remember(); return files.map(f=>({...f})); }, current: () => { remember(); return files[currentIndex]; } };

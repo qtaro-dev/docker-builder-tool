@@ -11,6 +11,67 @@
 const moduleRegistry = [];
 // カードを再作成しても他サービスの入力を消さない。新規構成時だけ明示的に消す。
 const configDrafts = new Map();
+const configurationReview = new window.ConfigurationReview.ReviewState();
+// チェック後に値が変更されたまま生成されないよう、生成入口でも現在値を照合する。
+function configurationFingerprint(id) {
+  const section = document.querySelector(`#configSections section[data-module-id="${id}"]`);
+  if (!section) return null;
+  return JSON.stringify({
+    projectName: document.getElementById("projectNameInput")?.value || "",
+    fields: [...section.querySelectorAll("input[data-field-name], select[data-field-name]")].map(e => [e.dataset.fieldName, e.value]),
+    image: window.ImageUI?.selected(id)?.image || null,
+  });
+}
+function updateConfigurationReview() {
+  const ids = getSelectedModuleIds();
+  const ready = configurationReview.ready(ids, configurationFingerprint);
+  let confirmed = 0;
+  for (const id of ids) {
+    const reviewed = Boolean(configurationReview.states.get(id)?.confirmed);
+    if (reviewed) confirmed++;
+    const section = document.querySelector(`#configSections section[data-module-id="${id}"]`);
+    const check = section?.querySelector(".module-review-checkbox");
+    if (check) check.checked = reviewed;
+    const status = section?.querySelector(".module-review-status");
+    if (status) { status.textContent = reviewed ? "確認済み" : "未確認"; status.dataset.confirmed = String(reviewed); }
+  }
+  const button = document.getElementById("generateButton");
+  if (button) {
+    button.disabled = !ready;
+    button.textContent = ready ? "構成を実行" : "構成を確認";
+  }
+  const status = document.getElementById("configurationReviewStatus");
+  if (status) status.textContent = `確認済み ${confirmed} / ${ids.length} — ${ready ? "構成を実行できます。" : ids.length ? "各モジュールの設定を確認し、「設定確認」にチェックしてください。" : "モジュールを選択し、設定を確認してください。"}`;
+  return ready;
+}
+function maskSectionSecrets(section) {
+  section.querySelectorAll("input[data-secret-field]").forEach(input => { input.type = "password"; });
+  section.querySelectorAll(".secret-visibility").forEach(toggle => { toggle.checked = false; });
+}
+function appendSecretControls(wrapper, input) {
+  input.type = "password"; input.dataset.secretField = "true";
+  input.autocomplete = "off"; input.spellcheck = false;
+  const controls = document.createElement("div"); controls.className = "secret-controls";
+  const label = document.createElement("label");
+  const toggle = document.createElement("input"); toggle.type = "checkbox"; toggle.className = "secret-visibility";
+  toggle.addEventListener("change", () => { input.type = toggle.checked ? "text" : "password"; });
+  label.append(toggle, document.createTextNode("パスワードを表示"));
+  const copy = document.createElement("button"); copy.type = "button"; copy.className = "secret-copy"; copy.textContent = "コピー";
+  copy.title = "明示操作でコピーします。クリップボード履歴や他アプリから読み取られる場合があります。";
+  const status = document.createElement("span"); status.className = "secret-copy-status"; status.setAttribute("role", "status"); status.setAttribute("aria-live", "polite");
+  let copying = false;
+  const update = () => { copy.disabled = copying || input.value.length === 0; status.textContent = ""; };
+  input.addEventListener("input", update); input.addEventListener("change", update); update();
+  copy.addEventListener("click", async () => {
+    // 秘密値は表示・ログ出力しない。クリック時に限って既存の制限されたClipboard APIへ渡す。
+    if (!input.value || copying) return;
+    copying = true; copy.disabled = true;
+    try { await navigator.clipboard.writeText(input.value); status.textContent = "コピーしました。"; }
+    catch { status.textContent = "コピーできませんでした。クリップボードを利用できる状態で再試行してください。"; }
+    finally { copying = false; copy.disabled = input.value.length === 0; }
+  });
+  controls.append(label, copy, status); wrapper.appendChild(controls);
+}
 function captureConfigDrafts() {
   document.querySelectorAll("#configSections section[data-module-id]").forEach(section => {
     const draft = {};
@@ -179,10 +240,11 @@ function renderConfigSections(reset = false) {
   const container = document.getElementById("configSections");
   if (!container) return;
 
-  if (reset === true) configDrafts.clear(); else captureConfigDrafts();
+  if (reset === true) { configDrafts.clear(); configurationReview.clear(); } else captureConfigDrafts();
   container.innerHTML = "";
 
   const selectedIds = getSelectedModuleIds();
+  configurationReview.sync(selectedIds);
   const activeModules = moduleRegistry.filter((m) => selectedIds.includes(m.id));
 
   activeModules.forEach((mod) => {
@@ -190,10 +252,31 @@ function renderConfigSections(reset = false) {
     section.className = "card";
     section.dataset.moduleId = mod.id;
 
-    const h2 = document.createElement("h2");
-    h2.textContent = mod.label || mod.name || mod.id || "";
-    section.appendChild(h2);
-    window.ImageUI?.appendControls(section, mod);
+    const state = configurationReview.states.get(mod.id);
+    const header = document.createElement("div"); header.className = "module-panel-header";
+    const h2 = document.createElement("h2"); h2.className = "module-panel-heading";
+    const toggle = document.createElement("button"); toggle.type = "button"; toggle.className = "module-panel-toggle";
+    const icon = document.createElement("img"); icon.src = mod.icon; icon.alt = ""; icon.className = "module-panel-icon";
+    const title = document.createElement("span"); title.className = "module-panel-name"; title.textContent = mod.label || mod.name || mod.id || "";
+    const arrow = document.createElement("span"); arrow.className = "module-panel-arrow"; arrow.setAttribute("aria-hidden", "true");
+    toggle.append(icon, title, arrow); h2.appendChild(toggle);
+    const reviewLabel = document.createElement("label"); reviewLabel.className = "module-review-label";
+    const review = document.createElement("input"); review.type = "checkbox"; review.className = "module-review-checkbox";
+    review.setAttribute("aria-label", `${title.textContent}の設定確認`);
+    const reviewStatus = document.createElement("span"); reviewStatus.className = "module-review-status";
+    reviewLabel.append(review, document.createTextNode("設定確認"), reviewStatus);
+    header.append(h2, reviewLabel); section.appendChild(header);
+    const body = document.createElement("div"); body.className = "module-panel-body"; body.id = `module-panel-${mod.id}`;
+    toggle.setAttribute("aria-controls", body.id);
+    const showPanel = () => {
+      body.hidden = !state.expanded; toggle.setAttribute("aria-expanded", String(state.expanded));
+      arrow.textContent = state.expanded ? "▾" : "▸";
+      if (!state.expanded) maskSectionSecrets(section);
+    };
+    toggle.addEventListener("click", () => { state.expanded = !state.expanded; showPanel(); });
+    review.addEventListener("change", () => { configurationReview.acknowledge(mod.id, configurationFingerprint(mod.id), review.checked); updateConfigurationReview(); });
+    section.appendChild(body);
+    window.ImageUI?.appendControls(body, mod);
     const draft = configDrafts.get(mod.id) || {};
 // 条件付き表示/自動入力のための参照テーブル
 const __fieldRows = new Map();
@@ -205,16 +288,20 @@ const __fieldBrowseBtns = new Map();
       const p = document.createElement("p");
       p.className = "note";
       p.textContent = mod.description;
-      section.appendChild(p);
+      body.appendChild(p);
     }
 
+    const advanced = document.createElement("details"); advanced.className = "module-advanced-settings";
+    const advancedTitle = document.createElement("summary"); advancedTitle.textContent = "詳細設定（リバースプロキシ）"; advanced.appendChild(advancedTitle);
     (mod.fields || []).forEach((field) => {
-      const row = document.createElement("label");
+      const fieldContainer = field.advanced ? advanced : body;
+      const row = document.createElement("div");
       row.className = "field-row";
       row.dataset.fieldName = field.name;
       __fieldRows.set(field.name, row);
 
-      const title = document.createElement("span");
+      const title = document.createElement("label");
+      title.htmlFor = `module-field-${mod.id}-${field.name}`;
       title.textContent = `${field.label}：`;
       row.appendChild(title);
 
@@ -225,10 +312,11 @@ const __fieldBrowseBtns = new Map();
       // 例: { type: "select", options: [{value:"light", label:"ライト"}, ...] }
       if (field.type === "select") {
         const select = document.createElement("select");
+        select.id = title.htmlFor;
         select.dataset.fieldName = field.name;
         select.dataset.moduleId = mod.id;
 
-        const opts = Array.isArray(field.options) ? field.options : [];
+        const opts = field.httpTargets ? [{value:"",label:"転送先を選択してください"}, ...activeModules.filter(m=>window.ProjectGeneration.httpPorts[m.id]).map(m=>({value:m.id,label:m.label||m.id}))] : Array.isArray(field.options) ? field.options : [];
         opts.forEach((opt) => {
           const o = document.createElement("option");
           if (typeof opt === "string") {
@@ -250,11 +338,12 @@ const __fieldBrowseBtns = new Map();
 
         wrapper.appendChild(select);
         row.appendChild(wrapper);
-        section.appendChild(row);
+        fieldContainer.appendChild(row);
         return; // 以降の input 作成処理はスキップ
       }
 
       const input = document.createElement("input");
+      input.id = title.htmlFor;
       input.type = field.type || "text";
       if (field.default !== undefined) input.value = field.default;
       if (Object.hasOwn(draft, field.name)) input.value = draft[field.name];
@@ -308,6 +397,7 @@ const __fieldBrowseBtns = new Map();
 
       // まず入力欄
       wrapper.appendChild(input);
+      if (window.ConfigurationReview.isSecretField(field)) appendSecretControls(wrapper, input);
 
       // パス系入力（例: dataDir / dataPath）はフォルダ選択ボタンを付ける
       // OS 操作は用途を限定した preload API を経由する
@@ -324,6 +414,7 @@ const __fieldBrowseBtns = new Map();
             if (result && !result.canceled && result.path) {
               // Windows の \ を / に統一（既存生成処理と合わせる）
               input.value = String(result.path).replace(/\\/g, "/");
+              input.dispatchEvent(new Event("input", { bubbles: true }));
             }
           } catch (e) {
             console.warn("フォルダ選択に失敗:", e);
@@ -335,8 +426,9 @@ const __fieldBrowseBtns = new Map();
       }
       row.appendChild(wrapper);
 
-      section.appendChild(row);
+      fieldContainer.appendChild(row);
     });
+    if (advanced.children.length > 1) body.appendChild(advanced);
 
 
 // [Mxx] 条件付き表示 / 自動入力 / 参照ボタン有効化
@@ -406,11 +498,21 @@ __updateConditionalUI();
         __fieldInputs.get(name)?.addEventListener("change", updateNotice);
         __fieldInputs.get(name)?.addEventListener("input", updateNotice);
       }
-      updateNotice(); section.appendChild(notice);
+      updateNotice(); body.appendChild(notice);
     }
-
+    // 開閉・確認・秘密値の表示/コピーは入力変更として扱わない。
+    const onSettingChanged = event => {
+      if (event.target.matches("input[data-field-name], select[data-field-name], .image-series, .image-variant, .framework-toggle-checkbox")) updateConfigurationReview();
+    };
+    body.addEventListener("input", onSettingChanged); body.addEventListener("change", onSettingChanged);
     container.appendChild(section);
+    showPanel();
   });
+  const project = document.getElementById("projectNameInput");
+  if (project && !project.dataset.reviewBound) {
+    project.addEventListener("input", updateConfigurationReview); project.addEventListener("change", updateConfigurationReview); project.dataset.reviewBound = "true";
+  }
+  updateConfigurationReview();
 }
 // [M03] END
 
@@ -425,6 +527,7 @@ window.__rendererModulesUI = {
   renderConfigSections,
   categoryOrderMap,
   moduleOrderMap,
+  areAllSettingsConfirmed: updateConfigurationReview,
 };
 
 // 互換：既存コードが直接参照していた場合に備えて公開

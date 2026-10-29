@@ -20,6 +20,13 @@ Thumbs.db
 /docker-builder.log
 /Project/
 /logs/
+/settings.json
+/.env
+/.env.*
+/tools/manual/qa/
+/docs/OLD/manual/
+/docs/OLD/docs-archive-manifest-*.json
+/image/
 
 # バックアップ・作業フォルダ（名前ゆらぎに強い）
 /バージョン*/

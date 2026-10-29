@@ -1,4 +1,4 @@
-// GUIと同じ生成器から再生成し、配布例と1バイトでも異なれば検証を中止する。
+// GUIと同じ生成器で検証。旧配布例との差分はWeb追加ファイルに限定して照合する。
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const {root} = require('./manual-recipe-plan.cjs');
 const {loadModules} = require('./headless-generation.cjs');
@@ -21,15 +21,29 @@ function prepare(recipe, directory) {
   assert.deepEqual(model.errors, []);
   const generated = [{relativePath: 'docker-compose.yml', content: renderComposeYaml(model)}, ...model.files];
   const source = path.join(root, 'docs/manual/examples', recipe.id);
+  const yaml=require('js-yaml');
+  const legacy=yaml.load(fs.readFileSync(path.join(source,'generated/docker-compose.yml'),'utf8'));
+  const current=yaml.load(generated[0].content), comparable=structuredClone(current);
+  for(const id of ['nginx','apache']) {
+    const name=recipe.projectName+'-'+id,svc=comparable.services[name],old=legacy.services[name];if(!svc||!old)continue;
+    assert.equal(recipe.configs[id]?.reverseProxy||'off','off','Legacy recipe proxy settings require explicit fixture updates');
+    svc.volumes=svc.volumes.filter(v=>!v.startsWith('./'+id+'/conf/'));
+    if(!old.build&&svc.build){assert.equal(svc.build.context,'./'+id);delete svc.build;svc.image=model.images.find(e=>e.moduleId===id).image;}
+    if(id==='apache'&&!old.command)delete svc.command;
+  }
+  assert.deepEqual(comparable,legacy,recipe.id+' unexpected change outside Web support assets');
   fs.mkdirSync(directory, {recursive: true});
   for (const file of generated) {
-    assert.equal(fs.readFileSync(path.join(source, 'generated', file.relativePath), 'utf8'), file.content, recipe.id + ' distributed output differs from application');
+    const prior=path.join(source,'generated',file.relativePath);
+    if(file.relativePath!=='docker-compose.yml'&&fs.existsSync(prior))assert.equal(fs.readFileSync(prior,'utf8'),file.content,recipe.id+' distributed output differs from application');
     const target = path.join(directory, file.relativePath);
     fs.mkdirSync(path.dirname(target), {recursive: true});fs.writeFileSync(target, file.content);
   }
   const additions = files(path.join(source, 'additions'));
   for (const file of additions) {
-    const target = path.join(directory, file);assert.ok(!fs.existsSync(target), 'Additional fixture overwrites generated output');
+    const target = path.join(directory, file);
+    // Webコンテンツの利用者置換だけ許可し、設定やComposeの上書きは従来どおり禁止する。
+    assert.ok(!fs.existsSync(target)||generated.some(f=>f.relativePath===file&&f.filename==='index.html'),'Additional fixture overwrites generated output');
     fs.mkdirSync(path.dirname(target), {recursive: true});fs.copyFileSync(path.join(source, 'additions', file), target);
   }
   const ciFixture=[];
@@ -43,7 +57,7 @@ function prepare(recipe, directory) {
     fs.writeFileSync(path.join(directory,'laravel/.env'),env);
     for(const sub of ['app','bootstrap/cache','storage/logs','storage/framework/views','storage/framework/sessions','storage/framework/cache'])fs.mkdirSync(path.join(directory,'laravel',sub),{recursive:true});
   }
-  const yaml=require('js-yaml'),document=yaml.load(generated[0].content);
+  const document=yaml.load(generated[0].content);
   for(const service of Object.values(document.services)) if(service.build) {
     const dockerfile=path.resolve(directory,service.build.context,service.build.dockerfile);
     assert.ok(dockerfile.startsWith(path.resolve(directory)+path.sep),'Build path escapes workspace');

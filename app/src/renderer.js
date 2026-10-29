@@ -7,7 +7,9 @@
 // [R01] サブモジュール読み込み（順序が重要）
 // ==============================
 import "./renderer/core.js";        // Cxx: ipc/fs/log/utils
+import "./configuration-review.js";
 import "./image-versions.js";
+import "./module-assets.js";
 import "./project-generation.js";
 import "./compose-serialization.js";
 import "./generation-guide.js";

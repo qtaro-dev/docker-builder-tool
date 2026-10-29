@@ -23,113 +23,86 @@ module.exports = async ({ run, until, wc, win, errors }) => {
   const apply = async id => {
     await choose(id);
     await run('document.getElementById("settingsApplyThemeButton").click()');
+    await until('!document.getElementById("settingsCloseButton").disabled');
     assert.equal(await run('window.__rendererCore.getTheme()'), id);
-    // capturePageは直前の合成フレームを返すことがあるため、描画完了を待つ。
+    assert.equal(JSON.parse(persisted()).theme, id);
     await run('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
   };
   const save = async () => {
     await run('document.getElementById("settingsSaveButton").click()');
-    await until('!document.getElementById("settingsDialog").open');
+    await until('!document.getElementById("settingsSaveButton").disabled');
+    assert.equal(await run('document.getElementById("settingsDialog").open'), true);
+    assert.match(await run('document.getElementById("settingsSaveError").textContent'), /フォルダ設定を保存しました/);
   };
   const close = async expected => {
     await run('new Promise(resolve => { document.getElementById("settingsDialog").addEventListener("close", () => resolve(), { once: true }); document.getElementById("settingsCloseButton").click(); })');
-    await until(`!document.getElementById('settingsDialog').open && window.__rendererCore.getTheme() === ${JSON.stringify(expected)}`);
-  };
-  const cancel = async (expected, keepOpen = false) => {
-    const beforeCancel = persisted();
-    await run('document.getElementById("settingsCancelButton").click()');
-    assert.equal(await run('document.getElementById("settingsDialog").open'), true);
     assert.equal(await run('window.__rendererCore.getTheme()'), expected);
-    assert.equal(await run('document.querySelector(\'.settings-theme-card[aria-checked="true"]\').dataset.themeId'), expected);
-    assert.equal(persisted(), beforeCancel, 'Cancel must not write settings');
-    if (!keepOpen) await close(expected);
   };
   await open();
-  assert.deepEqual(await run('Array.from(document.querySelectorAll(".settings-theme-card"), e => e.dataset.themeId)'),
-    ['system', 'light', 'dark', 'blue', 'green', 'yellow', 'orange', 'red', 'pink']);
+  const themes = ['system', 'light', 'dark', 'blue', 'green', 'yellow', 'orange', 'red', 'pink'];
+  assert.deepEqual(await run('Array.from(document.querySelectorAll(".settings-theme-card"), e => e.dataset.themeId)'), themes);
+  assert.equal(await run('document.querySelector(\'[data-section="project"]\').textContent.trim()'), 'フォルダ設定');
+  assert.equal(await run('document.getElementById("settingsApplyThemeButton").textContent'), '適用');
+  assert.equal(await run('document.querySelector("#settingsCancelButton, .settings-theme-preview")'), null);
+  assert.deepEqual(await run('Array.from(document.querySelectorAll(".settings-footer button"), e=>e.textContent)'), ['保存', '閉じる']);
   const before = persisted();
   await choose('pink');
   assert.equal(await run('window.__rendererCore.getTheme()'), 'dark');
-  assert.equal(await run('document.querySelector(\'.settings-theme-card[aria-checked="true"]\').dataset.themeId'), 'pink');
   assert.equal(persisted(), before);
+  await close('dark');
+  await open();
+  assert.equal(await run('document.querySelector(\'.settings-theme-card[aria-checked="true"]\').dataset.themeId'), 'dark');
 
   const screenshotDir = process.env.DOCKER_BUILDER_SCREENSHOT_DIR;
   if (screenshotDir) fs.mkdirSync(screenshotDir, { recursive: true });
-  // Real Chromium rendering: inspect the light, dark, color and narrow layouts.
-  for (const theme of ['light', 'dark', 'blue', 'green', 'yellow', 'orange', 'red', 'pink']) {
+  // Real Electron rendering and disk persistence for every theme; dirty folders stay uncommitted.
+  await run('document.getElementById("settingsProjectRootPath").value="missing-folder"');
+  for (const theme of themes) {
     await apply(theme);
+    assert.deepEqual(JSON.parse(persisted()).paths, fixture.paths);
+    assert.equal(JSON.parse(persisted()).defaultProjectName, fixture.defaultProjectName);
+    assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), 'missing-folder');
     assert.equal(await run('document.getElementById("settingsDialog").open'), true);
-    assert.equal(persisted(), before, 'Temporary application must not write settings');
-    assert.equal(await run('getComputedStyle(document.querySelector(".settings-theme-preview")).backgroundColor === getComputedStyle(document.body).backgroundColor'), true);
     assert.equal(await run('document.getElementById("themeToggleButton").textContent.includes(window.__rendererCore.themes.find(t=>t[0]===window.__rendererCore.getTheme())[1])'), true);
-    if (screenshotDir && ['light', 'dark', 'blue'].includes(theme)) {
-      fs.writeFileSync(path.join(screenshotDir, `${theme}.png`), (await wc.capturePage()).toPNG());
-    }
+    if (screenshotDir && ['light', 'dark', 'blue'].includes(theme)) fs.writeFileSync(path.join(screenshotDir, `${theme}.png`), (await wc.capturePage()).toPNG());
+    await close(theme);
+    await reload();
+    assert.equal(await run('window.__rendererCore.getTheme()'), theme);
+    await open();
+    assert.equal(await run('document.querySelector(\'.settings-theme-card[aria-checked="true"]\').dataset.themeId'), theme);
+    assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), __dirname);
+    await run('document.getElementById("settingsProjectRootPath").value="missing-folder"');
   }
-  await cancel('dark', true);
-  assert.equal(persisted(), before);
-  console.log('PASS nine cards, selection only, repeated temporary application, preview/header sync, no disk writes and cancel without closing');
+  console.log('PASS nine theme selection/apply/persistence/reload cycles; folder validation and dirty input independent; preview/Cancel removed');
 
-  await open();
-  await apply('blue');
-  await choose('pink');
-  await save();
-  assert.equal(JSON.parse(persisted()).theme, 'blue', 'Unapplied selection must not be saved');
-  assert.deepEqual(JSON.parse(persisted()).paths, fixture.paths);
-  assert.equal(JSON.parse(persisted()).defaultProjectName, fixture.defaultProjectName);
-  await reload();
-  assert.equal(await run('window.__rendererCore.getTheme()'), 'blue');
-  await run('document.getElementById("themeToggleButton").click()');
-  await until('!document.getElementById("themeToggleButton").disabled');
-  assert.equal(JSON.parse(persisted()).theme, 'green');
-  await open();
-  assert.equal(await run('document.querySelector(\'.settings-theme-card[aria-checked="true"]\').dataset.themeId'), 'green');
-  await apply('orange');
-  await run('document.getElementById("settingsProjectRootPath").value="not-a-valid-directory"');
-  await cancel('green', true);
-  assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), 'not-a-valid-directory', 'Theme cancel must preserve project input');
-  await close('green');
-  await open();
-  assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), __dirname);
-  await apply('pink');
-  wc.sendInputEvent({ type: 'keyDown', keyCode: 'ESC' });
-  wc.sendInputEvent({ type: 'keyUp', keyCode: 'ESC' });
-  await until('!document.getElementById("settingsDialog").open && window.__rendererCore.getTheme() === "green"');
-  await open();
-  await apply('red');
-  await close('green');
-  assert.equal(JSON.parse(persisted()).theme, 'green', 'Close button must discard unsaved theme');
-  await open();
-  await apply('pink');
-  await run('document.getElementById("settingsDialog").close()');
-  await until('window.__rendererCore.getTheme() === "green"');
-  assert.equal(JSON.parse(persisted()).theme, 'green');
-  console.log('PASS applied-only save, project input preserved by cancel, reload persistence, header toggle sync, Close button, Escape and standard close rollback');
-
-  await open();
   await apply('dark');
   const beforeFailure = persisted();
-  const layout = () => run(`(() => {
-    const dialog = document.getElementById('settingsDialog');
-    const section = document.getElementById('settings-appearance');
-    return { height: dialog.getBoundingClientRect().height, bodyHeight: section.clientHeight,
-      footerTop: document.querySelector('.settings-footer').getBoundingClientRect().top,
-      overflow: section.scrollHeight > section.clientHeight };
-  })()`);
-  const beforeErrorLayout = await layout();
-  assert.ok(beforeErrorLayout.height > 520, 'Settings dialog reserves extra vertical space');
-  assert.equal(beforeErrorLayout.overflow, false);
   await run('["ProjectRoot", "ComposeDir", "DockerfileDir", "LogDir"].forEach(name => { document.getElementById(`settings${name}Path`).value="not-a-valid-directory"; }); document.getElementById("settingsSaveButton").click()');
   await until('!document.getElementById("settingsSaveError").hidden && !document.getElementById("settingsSaveButton").disabled');
-  assert.match(await run('document.getElementById("settingsSaveError").textContent'), /プロジェクト内のパス指定を見直してください。\n対象：プロジェクトフォルダ/);
-  assert.match(await run('document.getElementById("settingsSaveError").textContent'), /docker-compose.yml 保存場所、Dockerfile 保存場所、ログ保存場所/);
-  assert.deepEqual(await layout(), beforeErrorLayout, 'Validation message must not move the footer or add scrolling');
+  assert.equal(await run('document.getElementById("settings-project").classList.contains("active")'), true);
+  assert.equal(await run('document.activeElement.id'), 'settingsProjectRootPath');
+  assert.equal(await run('document.querySelectorAll(\'#settings-project input[aria-invalid="true"]\').length'), 4);
+  assert.equal(await run('getComputedStyle(document.getElementById("settingsProjectRootHint")).color'), 'rgb(255, 138, 128)', 'Dark-theme errors must remain legible');
+  assert.match(await run('document.getElementById("settingsSaveError").textContent'), /対象：プロジェクトフォルダ、docker-compose.yml 保存場所、Dockerfile 保存場所、ログ保存場所。存在するフォルダ/);
   assert.equal(persisted(), beforeFailure);
+  assert.equal(await run('window.__rendererCore.getTheme()'), 'dark');
   if (screenshotDir) {
     await run('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     fs.writeFileSync(path.join(screenshotDir, 'validation-error.png'), (await wc.capturePage()).toPNG());
   }
+  // A folder error cannot prevent the independently committed theme.
+  await run('document.querySelector(\'[data-section="appearance"]\').click()');
+  await apply('blue');
+  await choose('pink');
   await run(`["ProjectRoot", "ComposeDir", "DockerfileDir", "LogDir"].forEach(name => { document.getElementById(\`settings\${name}Path\`).value=${JSON.stringify(__dirname)}; })`);
+  await save();
+  assert.equal(JSON.parse(persisted()).theme, 'blue', 'Folder Save must ignore unapplied theme selection');
+  assert.equal(await run('document.querySelectorAll(\'#settings-project input[aria-invalid="true"]\').length'), 0);
+  await close('blue');
+  console.log('PASS invalid folder Save auto-navigation, field errors/focus, no write; correction/retry; folder Save stays open and preserves applied theme');
+
+  await open();
+  const beforeWriteFailure = persisted();
   const write = fs.writeFileSync;
   const errorStart = errors.length;
   fs.writeFileSync = (filename, ...args) => {
@@ -137,17 +110,55 @@ module.exports = async ({ run, until, wc, win, errors }) => {
     return write(filename, ...args);
   };
   try {
-    await run('document.getElementById("settingsSaveButton").click()');
-    await until('!document.getElementById("settingsSaveError").hidden && !document.getElementById("settingsSaveButton").disabled');
+    await run('document.getElementById("settingsComposeDirPath").value=""; document.getElementById("settingsSaveButton").click()');
+    await until('!document.getElementById("settingsSaveButton").disabled');
+    assert.match(await run('document.getElementById("settingsSaveError").textContent'), /保存できません/);
+    assert.equal(await run('document.getElementById("settingsComposeDirPath").value'), '');
     assert.equal(await run('document.getElementById("settingsDialog").open'), true);
-    assert.equal(persisted(), beforeFailure);
-    assert.deepEqual(await layout(), beforeErrorLayout, 'Save failure message must use the reserved space');
+    assert.equal(persisted(), beforeWriteFailure);
+    await run('document.querySelector(\'[data-section="appearance"]\').click()');
+    await choose('red');
+    await run('document.getElementById("settingsApplyThemeButton").click()');
+    await until('!document.getElementById("settingsCloseButton").disabled');
+    assert.match(await run('document.getElementById("settingsThemeError").textContent'), /テーマを保存できません/);
+    assert.equal(await run('window.__rendererCore.getTheme()'), 'blue');
+    assert.equal(persisted(), beforeWriteFailure);
   } finally { fs.writeFileSync = write; }
   const expectedErrors = errors.splice(errorStart);
   assert.ok(expectedErrors.every(message => message.includes('設定保存に失敗:')), JSON.stringify(expectedErrors));
-  await cancel('green');
-  assert.equal(JSON.parse(persisted()).theme, 'green');
-  console.log('PASS validation/save errors use reserved space without extra scrolling or footer movement, keep dialog open and leave disk unchanged');
+  await apply('red');
+  await save();
+  assert.equal(JSON.parse(persisted()).paths.composeDir, undefined, 'Empty optional directory is valid');
+  assert.equal(JSON.parse(persisted()).theme, 'red');
+  await choose('pink');
+  await run('document.getElementById("settingsProjectRootPath").value="discard-me"');
+  await close('red');
+  await open();
+  assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), __dirname);
+  assert.equal(await run('document.getElementById("settingsComposeDirPath").value'), '');
+  await choose('pink');
+  await run('document.getElementById("settingsProjectRootPath").value="discard-on-escape"');
+  win.focus(); wc.focus();
+  wc.sendInputEvent({ type: 'keyDown', keyCode: 'ESC' });
+  wc.sendInputEvent({ type: 'keyUp', keyCode: 'ESC' });
+  await until('!document.getElementById("settingsDialog").open');
+  await open();
+  assert.equal(await run('window.__rendererCore.getTheme()'), 'red');
+  assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), __dirname);
+  await apply('dark');
+  await choose('pink');
+  await run('document.getElementById("settingsDialog").close()');
+  await until('!document.getElementById("settingsDialog").open');
+  assert.equal(await run('window.__rendererCore.getTheme()'), 'dark');
+  await reload();
+  assert.equal(await run('window.__rendererCore.getTheme()'), 'dark');
+  await run('document.getElementById("themeToggleButton").click()');
+  await until('!document.getElementById("themeToggleButton").disabled');
+  assert.equal(JSON.parse(persisted()).theme, 'blue');
+  await open();
+  assert.equal(await run('document.querySelector(\'.settings-theme-card[aria-checked="true"]\').dataset.themeId'), 'blue');
+  await close('blue');
+  console.log('PASS folder/theme write failures preserve inputs and committed state; retry; optional blank; Close/Escape/native close discard drafts; header sync');
 
   wc.debugger.attach('1.3');
   try {
@@ -159,38 +170,22 @@ module.exports = async ({ run, until, wc, win, errors }) => {
     await wc.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
     await until('document.documentElement.dataset.theme === "dark"');
     assert.equal(persisted(), beforeAuto);
-    await save();
-    assert.equal(JSON.parse(persisted()).theme, 'system');
+    await close('system');
     await reload();
     assert.equal(await run('window.__rendererCore.getTheme()'), 'system');
     assert.equal(await run('document.documentElement.dataset.theme'), 'dark');
-    await open();
-    await apply('pink');
-    await cancel('system');
-    assert.equal(await run('document.documentElement.dataset.theme'), 'dark');
-    await wc.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
-    await until('document.documentElement.dataset.theme === "light"');
   } finally { wc.debugger.detach(); }
-  console.log('PASS system theme follows OS changes, persists logical system setting and survives cancel/reload');
+  console.log('PASS system theme follows OS while persisting logical system setting');
 
   await open();
-  await apply('blue');
-  win.setSize(540, 620);
+  win.setContentSize(540, 620);
   await run('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
   assert.equal(await run('document.getElementById("settingsThemeCards").scrollWidth <= document.getElementById("settingsThemeCards").clientWidth'), true);
   assert.equal(await run('document.querySelector(".settings-content").scrollWidth <= document.querySelector(".settings-content").clientWidth'), true);
   assert.equal(await run('document.getElementById("settingsSaveButton").getBoundingClientRect().bottom <= innerHeight'), true);
   if (screenshotDir) fs.writeFileSync(path.join(screenshotDir, 'narrow.png'), (await wc.capturePage()).toPNG());
-  await cancel('system');
-  win.setSize(1280, 800);
-  // A project edit still uses the existing save path while the current theme is retained.
-  await open();
-  await run('document.getElementById("settingsComposeDirPath").value=""');
-  await save();
-  assert.equal(JSON.parse(persisted()).paths.composeDir, undefined);
-  assert.equal(JSON.parse(persisted()).paths.projectRoot, __dirname);
-  assert.equal(JSON.parse(persisted()).theme, 'system');
-
+  await close('system');
+  win.setContentSize(1280, 900);
   await open();
   await run('document.querySelector(\'[data-section="project"]\').click()');
   const beforeInitialize = persisted();
@@ -237,6 +232,7 @@ module.exports = async ({ run, until, wc, win, errors }) => {
   assert.equal(await run('document.getElementById("settingsProjectRootPath").value'), oldRootInput);
   await initialize();
   await save();
+  await close('system');
   assert.deepEqual(JSON.parse(persisted()).paths, expectedPaths);
   await reload();
   assert.deepEqual(await run('window.electronAPI.getSettings().then(s=>s.paths)'), expectedPaths);
@@ -251,13 +247,14 @@ module.exports = async ({ run, until, wc, win, errors }) => {
   await run(`window.electronAPI.saveSettings({paths:{...${JSON.stringify(expectedPaths)},projectRoot:'missing-saved-project'}})`);
   await reload();
   await open();
-  await until('document.getElementById("settingsSaveError").textContent.includes("プロジェクト内のパス指定")');
+  await until('document.getElementById("settingsSaveError").textContent.includes("フォルダ設定のパス指定")');
   assert.match(await run('document.getElementById("settingsSaveError").textContent'), /対象：プロジェクトフォルダ/);
   await run(`document.getElementById('settingsProjectRootPath').value=${JSON.stringify(expectedPaths.projectRoot)}; document.getElementById('settingsProjectRootPath').dispatchEvent(new Event('input'));`);
   await until('document.getElementById("settingsSaveError").hidden');
   await close('system');
-  console.log('PASS invalid saved paths are explained in the appearance footer and correction clears the reason');
+  console.log('PASS previously saved invalid paths are explained; correction clears field and footer errors');
+
   await run(`window.electronAPI.saveSettings(${JSON.stringify(original)})`);
   await reload();
-  console.log('PASS narrow dialog layout, reachable footer, project save/cancel behavior; original test settings restored');
+  console.log('PASS narrow dialog layout and default-folder initialization safety; original test settings restored');
 };

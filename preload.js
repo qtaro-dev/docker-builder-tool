@@ -3,6 +3,8 @@ const { contextBridge, ipcRenderer } = require("electron");
 // Never expose raw IPC, Electron events, or filesystem access to the page.
 contextBridge.exposeInMainWorld("electronAPI", {
   getVersion: () => ipcRenderer.invoke("get-app-version"),
+  getAboutInfo: () => ipcRenderer.invoke("about:info"),
+  openProjectPage: () => ipcRenderer.invoke("about:openProjectPage"),
   getImageCatalog: () => ipcRenderer.invoke("images:get"),
   updateImageCatalog: () => ipcRenderer.invoke("images:update"),
   getSettings: () => ipcRenderer.invoke("settings:get"),
@@ -13,6 +15,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   pickDirectory: (title) => ipcRenderer.invoke("dialog:openDirectory", { title }),
   writeLog: (message) => ipcRenderer.invoke("write-log", message),
   saveGeneratedFile: (filename, content) => ipcRenderer.invoke("file:saveGenerated", filename, content),
+  saveGeneratedBundle: (files, projectName) => ipcRenderer.invoke("file:saveBundle", files, projectName),
   onMenuCommand: (handler) => {
     const listener = (_event, command) => handler(command);
     ipcRenderer.on("menu-command", listener);

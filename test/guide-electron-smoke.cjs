@@ -1,3 +1,4 @@
+// 既存生成試験の前提として、入力後に実UIの「設定確認」を明示操作する。
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -31,13 +32,13 @@ module.exports = async ({ run, until, wc, win }) => {
     document.querySelector('[data-module-id=nodejs] select[data-field-name=dataStoreType]').dispatchEvent(new Event('change'));
     document.querySelector('[data-module-id=nodejs] input[data-field-name=startCmd]').value = 'npm install && npm run dev';
     document.querySelector('[data-module-id=nodejs] input[data-field-name=startCmd]').dispatchEvent(new Event('input'));
-    window.__rendererGenerate.generateConfigs();`);
+    window.__testConfirmModules(); window.__rendererGenerate.generateConfigs();`);
   assert.match(await run("document.querySelector('.node-runtime-notice').textContent"), /互換モード.*二重実行/s);
   assert.match(await run("document.getElementById('composeOutput').value"), /node-app:\/app/);
   await run(`document.querySelector('[data-module-id=nodejs] select[data-field-name=dataStoreType]').value = 'image';
     document.querySelector('[data-module-id=nodejs] select[data-field-name=dataStoreType]').dispatchEvent(new Event('change'));
     document.querySelector('[data-module-id=nodejs] input[data-field-name=startCmd]').value = 'npm run dev';
-    window.__rendererGenerate.generateConfigs(); document.querySelector('[data-tab=output]').click();`);
+    window.__testConfirmModules(); window.__rendererGenerate.generateConfigs(); document.querySelector('[data-tab=output]').click();`);
   const compose = await run("document.getElementById('composeOutput').value");
   assert.doesNotMatch(compose, /node-app|npm install/);
   assert.match(compose, /3456:3000/);
@@ -47,7 +48,7 @@ module.exports = async ({ run, until, wc, win }) => {
   assert.equal(await run("document.querySelectorAll('#generationGuideDialog section').length"), 3);
   assert.match(await run("document.getElementById('guideStartup').textContent"), /docker compose config -q.*docker compose up --build -d.*docker compose logs.*docker compose stop/s);
   assert.match(await run("document.getElementById('guidePlacementNotes').textContent"), /build.context = .\/nodejs/);
-  assert.match(await run("document.getElementById('guideSecurity').textContent"), /リバースプロキシ設定は自動生成しません/);
+  assert.match(await run("document.getElementById('guideSecurity').textContent"), /リバースプロキシはOFF/);
   assert.match(await run("document.getElementById('guideSecurity').textContent"), /3456:3000/);
   assert.match(await run("document.getElementById('generatedPlacementGuide').textContent"), /package-lock.json（利用者が準備）/);
   assert.equal(await run("document.getElementById('guideEditNotice').hidden"), true);
@@ -80,16 +81,16 @@ module.exports = async ({ run, until, wc, win }) => {
   await run("document.getElementById('generationGuideCloseButton').click(); document.getElementById('composeClearBtn').click()");
   assert.equal(await run("document.getElementById('generationGuideButton').disabled"), true);
   assert.equal(await run("document.getElementById('guideSecurity').textContent"), "");
-  await run("document.querySelector('.module-row[data-module-id=nodejs]').click(); window.__rendererGenerate.generateConfigs()");
+  await run("document.querySelector('.module-row[data-module-id=nodejs]').click(); window.__testConfirmModules(); window.__rendererGenerate.generateConfigs()");
   assert.doesNotMatch(await run("document.getElementById('generatedPlacementGuide').textContent"), /nodejs|package-lock/);
-  assert.doesNotMatch(await run("document.getElementById('guideStartup').textContent"), /up --build/);
-  assert.doesNotMatch(await run("document.getElementById('guideSecurity').textContent"), /Node.js|nodejs|リバースプロキシ/);
+  assert.match(await run("document.getElementById('guideStartup').textContent"), /up --build/);
+  assert.doesNotMatch(await run("document.getElementById('guideSecurity').textContent"), /Node.js|nodejs/);
   await run("window.__rendererUI.clearResultsOnly()");
   assert.equal(await run("document.getElementById('generationGuideButton').disabled"), true);
   assert.equal(await run("document.getElementById('generatedPlacementGuide').textContent"), "");
   console.log("PASS guide generation snapshot, manual edit/individual clear notices, re-generation and full clear remove stale content");
 
-  await run("document.querySelector('.module-row[data-module-id=nodejs]').click(); window.__rendererGenerate.generateConfigs(); document.getElementById('generationGuideButton').click()");
+  await run("document.querySelector('.module-row[data-module-id=nodejs]').click(); window.__testConfirmModules(); window.__rendererGenerate.generateConfigs(); document.getElementById('generationGuideButton').click()");
   const screenshots = process.env.DOCKER_BUILDER_SCREENSHOT_DIR;
   const luminance = color => color.match(/[\d.]+/g).slice(0, 3).map(Number).map(v => { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }).reduce((total, v, n) => total + v * [.2126, .7152, .0722][n], 0);
   for (const themeName of ["system", "light", "dark", "blue", "green", "yellow", "orange", "red", "pink"]) {

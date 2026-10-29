@@ -1,3 +1,4 @@
+// 既存生成試験の前提として、入力後に実UIの「設定確認」を明示操作する。
 const { app, BrowserWindow, Menu, dialog, clipboard } = require("electron");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -23,7 +24,7 @@ require("./main");
   // 狭幅の確認は各テストで別途リサイズし、アプリ本体の寸法は変更しない。
   win.setContentSize(1280, 900);
   console.log('Electron test viewport:', win.getContentSize());
-  const run = (code) => wc.executeJavaScript(code, true);
+  const run = (code) => wc.executeJavaScript(`window.__testConfirmModules = () => { document.querySelectorAll("#configSections .module-review-checkbox").forEach(check => { if (check.checked) check.click(); check.click(); }); };\n${code}`, true);
   const until = async (code) => {
     for (let i = 0; i < 100; i++) {
       if (await run(code)) return;
@@ -39,19 +40,21 @@ require("./main");
   assert.equal(preferences.webSecurity, true);
   assert.deepEqual(await run('[typeof require, typeof process, typeof window.electronAPI.invoke]'),
     ["undefined", "undefined", "undefined"]);
-  const version = require("./package.json").version;
+  const version = require("./app-info").describeApp().displayVersion;
   await until(`document.getElementById("aboutVersion").textContent === ${JSON.stringify(version)}`);
+  await require('./manual-menu-smoke.cjs')({run,until,wc,win});
   console.log("PASS startup, 19 modules, isolation and version IPC");
 
   await run(`document.querySelector('[data-module-id="nginx"]').click();
     document.querySelector('[data-tab="config"]').click();
     document.getElementById('projectNameInput').value = 'security-test';
     document.querySelector('input[data-field-name="hostPort"]').value = '9090';
-    document.getElementById('generateButton').click();`);
+    window.__testConfirmModules(); document.getElementById('generateButton').click();`);
   await until('document.getElementById("composeOutput").value.includes("9090:80")');
   const compose = await run('document.getElementById("composeOutput").value');
   assert.match(compose, /security-test-nginx/);
-  assert.match(compose, /nginx:1\.30\.\d+-.+@sha256:[a-f0-9]{64}/);
+  assert.match(compose, /dockerfile: "Dockerfile.nginx"/);
+  assert.match(await run('window.GeneratedFiles.all().find(f=>f.filename==="Dockerfile.nginx").content'), /nginx:1\.30\.\d+-.+@sha256:[a-f0-9]{64}/);
   console.log("PASS module selection, config inputs and Nginx Compose generation");
 
   // Stub only destination selection; the real save IPC and filesystem run.
@@ -103,8 +106,12 @@ require("./main");
   await run('document.getElementById("settingsProjectRootBrowse").click()');
   await until(`document.getElementById('settingsProjectRootPath').value === ${JSON.stringify(__dirname)}`);
   await run(`document.querySelector('.settings-theme-card[data-theme-id="dark"]').click();
-    document.getElementById('settingsApplyThemeButton').click();
-    document.getElementById('settingsSaveButton').click();`);
+    document.getElementById('settingsApplyThemeButton').click();`);
+  await until('!document.getElementById("settingsCloseButton").disabled');
+  await run('document.getElementById("settingsSaveButton").click()');
+  await until('!document.getElementById("settingsSaveButton").disabled');
+  assert.equal(await run('document.getElementById("settingsDialog").open'), true);
+  await run('document.getElementById("settingsCloseButton").click()');
   await until('!document.getElementById("settingsDialog").open');
   assert.equal(JSON.parse(fs.readFileSync(path.join(__dirname, "settings.json"))).theme, "dark");
   assert.equal(await run('document.documentElement.dataset.theme'), "dark");
@@ -141,7 +148,7 @@ require("./main");
   console.log("PASS invalid IPC payload rejection and log newline protection");
 
   await run('document.querySelector(\'[data-module-id="nodejs"]\').click()');
-  await run('window.__rendererGenerate.generateConfigs()');
+  await run('window.__testConfirmModules(); window.__rendererGenerate.generateConfigs()');
   const dockerfile = await run('document.getElementById("dockerfileOutput").value');
   assert.match(dockerfile, /FROM node:/);
   await run('document.querySelector(\'[data-tab="output"]\').click()');
@@ -159,10 +166,12 @@ require("./main");
   await run('document.getElementById("aboutCloseButton").click()');
   assert.equal(await run('document.getElementById("aboutDialog").open'), false);
 
+  await require("./about-electron-smoke.cjs")({ run, until, wc, win });
+
   await run(`window.__rendererModulesUI.registerModule({id:'test-xss',label:'<img src=x onerror=alert(1)>', requires:['db']});
     window.__rendererModulesUI.renderModuleList();
     document.querySelector('[data-module-id="test-xss"]').click();
-    window.__rendererGenerate.generateConfigs();`);
+    window.__testConfirmModules(); window.__rendererGenerate.generateConfigs();`);
   assert.match(await run('document.getElementById("portMessage").textContent'), /<img/);
   assert.equal(await run('document.querySelector("#portMessage img") === null'), true);
   // Inline script and network requests must be rejected by CSP.
@@ -183,6 +192,11 @@ require("./main");
   await require("./image-electron-smoke.cjs")({ run, until, wc, win, errors });
   await require("./guide-electron-smoke.cjs")({ run, until, wc, win, errors });
   await require("./manual-generation-smoke.cjs")({ run, until, wc, win, errors });
+  await require("./configuration-ui-smoke.cjs")({ run, until, wc, win, errors });
+  await require("./module-selection-smoke.cjs")({ run, wc, win });
+  await require("./web-support-smoke.cjs")({ run, until, wc, win });
+  await require("./bundle-folder-smoke.cjs")({ run, until, wc, win });
+  await require("./output-layout-smoke.cjs")({ run, until, wc, win });
 
   await wc.reload();
   await until('document.querySelectorAll(".module-row").length === 19');

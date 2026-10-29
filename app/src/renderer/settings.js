@@ -35,7 +35,7 @@ async function applyInitialSettings() {
   }
 }
 
-// 開き直した際は保存済みのプロジェクト設定を復元し、キャンセルした入力を残さない。
+// 開き直した際は保存済みのフォルダ設定を復元し、未保存の入力を残さない。
 function populateSettingsFields(settings) {
   const sProj = document.getElementById("settingsDefaultProject");
   if (sProj) sProj.value = settings.defaultProjectName || "myapp";
@@ -66,13 +66,18 @@ function setHint(id, text, isError) {
   el.textContent = text || "";
   if (isError) el.classList.add("error");
   else el.classList.remove("error");
+  const input = document.getElementById(id.replace(/Hint$/, "Path"));
+  if (input) {
+    input.setAttribute("aria-invalid", String(!!isError));
+    input.setAttribute("aria-describedby", id);
+  }
   if (projectPathFields.some(field => id === `settings${field.name}Hint`)) updateProjectPathMessage();
 }
 
 // 外観タブからでも、プロジェクト内のどの項目が保存を妨げているか分かるようにする。
 function projectPathErrorMessage(invalids) {
   const labels = projectPathFields.filter(field => invalids.includes(field.key)).map(field => field.label);
-  return `プロジェクト内のパス指定を見直してください。\n対象：${labels.join("、")}`;
+  return `フォルダ設定のパス指定を見直してください。\n対象：${labels.join("、")}。存在するフォルダを選択するか、任意項目を空欄にしてください。`;
 }
 
 function updateProjectPathMessage() {
@@ -225,9 +230,6 @@ function setupSettingsNavigation() {
 async function saveSettingsFromDialog() {
   const api = window.electronAPI;
 
-  const sProj = document.getElementById("settingsDefaultProject");
-  const appliedTheme = settingsSession?.appliedTheme || window.__rendererCore.getTheme();
-
   const projectRoot = document.getElementById("settingsProjectRootPath")?.value?.trim() || "";
   const composeDir = document.getElementById("settingsComposeDirPath")?.value?.trim() || "";
   const dockerfileDir = document.getElementById("settingsDockerfileDirPath")?.value?.trim() || "";
@@ -245,47 +247,38 @@ async function saveSettingsFromDialog() {
   if (logDir)
     await isValidDirectoryPath(logDir) ? (paths.logDir = logDir) : invalids.push("logDir");
 
-  // invalid のヒント表示
-  if (invalids.includes("projectRoot")) setHint("settingsProjectRootHint", "そのパスは無効です。", true);
-  if (invalids.includes("composeDir")) setHint("settingsComposeDirHint", "そのパスは無効です。", true);
-  if (invalids.includes("dockerfileDir")) setHint("settingsDockerfileDirHint", "そのパスは無効です。", true);
-  if (invalids.includes("logDir")) setHint("settingsLogDirHint", "そのパスは無効です。", true);
-
-  if (invalids.length > 0) return { ok: false, error: projectPathErrorMessage(invalids), kind: "paths" };
-
-  const newSettings = {
-    defaultProjectName: sProj ? sProj.value.trim() || "myapp" : lastSavedSettings?.defaultProjectName || "myapp",
-    theme: appliedTheme,
-    paths,
-  };
+  projectPathFields.forEach(field => setHint(`settings${field.name}Hint`,
+    invalids.includes(field.key) ? `${field.label}：存在するフォルダを選択するか、空欄にしてください。` : "",
+    invalids.includes(field.key)));
+  if (invalids.length > 0) {
+    document.querySelector('.settings-nav-item[data-section="project"]')?.click();
+    const first = projectPathFields.find(field => invalids.includes(field.key));
+    document.getElementById(`settings${first.name}Path`)?.focus();
+    return { ok: false, error: projectPathErrorMessage(invalids), kind: "paths" };
+  }
 
   if (!api) return { ok: false };
 
-  const saved = await api.saveSettings(newSettings);
-
-  // 即時反映：プロジェクト名
-  const pn = document.getElementById("projectNameInput");
-  if (pn) pn.value = saved.defaultProjectName || "myapp";
-
-  // 適用済みのテーマだけを確定。未適用の選択は保存しない。
+  // フォルダだけの差分を保存し、テーマや構成入力のプロジェクト名には触れない。
+  const saved = await api.saveSettings({ paths });
   lastSavedSettings = saved;
-  window.__rendererCore.applyTheme(saved.theme);
 
   return { ok: true };
 }
 // [S05] END
 
 // ==============================
-// [S06] 設定ダイアログ初期化（保存/キャンセル）
+// [S06] 設定ダイアログ初期化（テーマ適用とフォルダ保存は独立）
 // ==============================
-// ダイアログを開いた時点をトランザクションの境界にする。
+// 開くたびに保存済みフォルダと現在のテーマを選択状態へ復元する。
 function beginSettingsSession() {
-  // closeイベントの配送前に開き直した場合も、前回の取り消しを先に完了する。
+  // closeイベントの配送前に開き直した場合も、前回の未保存入力を先に破棄する。
   if (settingsSession) endSettingsSession();
   const theme = window.__rendererCore.getTheme();
-  settingsSession = { originalTheme: theme, selectedTheme: theme, appliedTheme: theme, saving: false, committed: false };
+  settingsSession = { selectedTheme: theme, saving: false };
   if (lastSavedSettings) populateSettingsFields(lastSavedSettings);
   showSettingsError("");
+  document.getElementById("settingsThemeError").textContent = "";
   const initializeStatus = document.getElementById("settingsInitializePathsStatus");
   if (initializeStatus) initializeStatus.textContent = "";
   syncAppearance();
@@ -293,9 +286,9 @@ function beginSettingsSession() {
 }
 
 function endSettingsSession() {
-  const session = settingsSession;
   settingsSession = null;
-  if (session && !session.committed) window.__rendererCore.applyTheme(session.originalTheme);
+  // 確定済み設定は巻き戻さず、未保存の入力だけを破棄する。
+  if (lastSavedSettings) populateSettingsFields(lastSavedSettings);
   syncAppearance();
 }
 
@@ -308,7 +301,7 @@ function showSettingsError(message, kind = "general") {
 function syncAppearance() {
   const core = window.__rendererCore;
   const selected = settingsSession?.selectedTheme || core.getTheme();
-  const applied = settingsSession?.appliedTheme || core.getTheme();
+  const applied = core.getTheme();
   const saving = !!(settingsSession?.saving || settingsSession?.initializing);
   document.querySelectorAll(".settings-theme-card").forEach(card => {
     const checked = card.dataset.themeId === selected;
@@ -323,13 +316,11 @@ function syncAppearance() {
   const label = id => core.themes.find(([theme]) => theme === id)?.[1] || id;
   const status = document.getElementById("settingsThemeStatus");
   if (status) status.textContent = selected !== applied
-    ? `「${label(selected)}」は未適用です。保存するテーマ：${label(applied)}`
-    : `適用中：${label(applied)}。保存すると確定します。`;
+    ? `「${label(selected)}」は未適用です。「適用」で反映・保存します。`
+    : `適用中：${label(applied)}（保存済み）`;
   const apply = document.getElementById("settingsApplyThemeButton");
   if (apply) apply.disabled = saving || selected === applied;
-  const previewName = document.getElementById("settingsPreviewThemeName");
-  if (previewName) previewName.textContent = `${label(applied)}の配色見本`;
-  ["settingsSaveButton", "settingsCancelButton", "settingsCloseButton", "settingsInitializePathsButton"].forEach(id => {
+  ["settingsSaveButton", "settingsCloseButton", "settingsInitializePathsButton"].forEach(id => {
     const button = document.getElementById(id);
     if (button) button.disabled = saving;
   });
@@ -387,7 +378,6 @@ function setupSettingsDialog() {
 
   const settingsDialog = document.getElementById("settingsDialog");
   const saveBtn = document.getElementById("settingsSaveButton");
-  const cancelBtn = document.getElementById("settingsCancelButton");
   document.getElementById("settingsInitializePathsButton")?.addEventListener("click", async () => {
     if (!settingsSession || settingsSession.saving || settingsSession.initializing) return;
     const session = settingsSession;
@@ -414,10 +404,23 @@ function setupSettingsDialog() {
       syncAppearance();
     }
   });
-  document.getElementById("settingsApplyThemeButton")?.addEventListener("click", () => {
+  document.getElementById("settingsApplyThemeButton")?.addEventListener("click", async () => {
     if (!settingsSession || settingsSession.saving || settingsSession.initializing) return;
-    settingsSession.appliedTheme = settingsSession.selectedTheme;
-    window.__rendererCore.applyTheme(settingsSession.appliedTheme);
+    const session = settingsSession;
+    const theme = session.selectedTheme;
+    session.saving = true;
+    syncAppearance();
+    try {
+      // パス検証を経由せずテーマだけを保存。書き込み成功後に共通処理で反映する。
+      lastSavedSettings = await window.electronAPI.saveSettings({ theme });
+      window.__rendererCore.applyTheme(theme);
+      document.getElementById("settingsThemeError").textContent = "";
+    } catch {
+      document.getElementById("settingsThemeError").textContent = "テーマを保存できませんでした。保存先の書き込み権限を確認して再度「適用」してください。";
+    } finally {
+      session.saving = false;
+      syncAppearance();
+    }
   });
 
   if (saveBtn) {
@@ -430,12 +433,12 @@ function setupSettingsDialog() {
       try {
         const result = await saveSettingsFromDialog();
         if (result?.ok) {
-          session.committed = true;
-          settingsDialog.close();
+          showSettingsError("フォルダ設定を保存しました。", "success");
         } else {
           showSettingsError(result?.error || "設定を保存できませんでした。入力内容を確認してください。", result?.kind);
         }
       } catch (e) {
+        document.querySelector('.settings-nav-item[data-section="project"]')?.click();
         console.error("設定保存に失敗:", e);
         showSettingsError("設定を保存できませんでした。保存先の権限などを確認して再試行してください。");
       } finally {
@@ -444,18 +447,11 @@ function setupSettingsDialog() {
       }
     });
   }
-  if (cancelBtn) cancelBtn.addEventListener("click", () => {
-    if (!settingsSession || settingsSession.saving || settingsSession.initializing) return;
-    // キャンセルはテーマだけを開いた時点へ戻す。画面とプロジェクトの入力は維持する。
-    settingsSession.selectedTheme = settingsSession.originalTheme;
-    settingsSession.appliedTheme = settingsSession.originalTheme;
-    window.__rendererCore.applyTheme(settingsSession.originalTheme);
-  });
   const closeBtn = document.getElementById("settingsCloseButton");
   closeBtn?.addEventListener("click", () => {
     if (!settingsSession?.saving && !settingsSession?.initializing) settingsDialog.close();
   });
-  // Escapeも標準のcloseイベントへ集約し、保存成功以外は必ず元へ戻す。
+  // Escapeも標準のcloseイベントへ集約し、未確定の入力だけを破棄する。
   settingsDialog?.addEventListener("cancel", event => {
     if (settingsSession?.saving || settingsSession?.initializing) event.preventDefault();
   });

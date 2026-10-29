@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'" />
-  <title>Docker 構成ジェネレータ（モジュール版・プロトタイプ）</title>
+  <title>Docker 構成ジェネレーター</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
   <header class="app-header">
-    <h1 class="app-title">Docker 構成ジェネレータ（モジュール版・プロトタイプ）</h1>
+    <h1 class="app-title">Docker 構成ジェネレーター</h1>
     <button id="themeToggleButton" type="button" class="theme-toggle-button">
       🌙 ダーク
     </button>
@@ -71,9 +71,10 @@
 
           <!-- ★ ボタン＋メッセージは executor-row の中に置く -->
           <div class="executor-actions">
-            <button id="generateButton" type="button" class="primary-button">
-              構成を実行
+            <button id="generateButton" type="button" class="primary-button" disabled aria-describedby="configurationReviewStatus">
+              構成を確認
             </button>
+            <p id="configurationReviewStatus" class="note" role="status" aria-live="polite">確認済み 0 / 0 — モジュールを選択し、設定を確認してください。</p>
             <div id="portMessage" class="generate-message"></div>
           </div>
         </div>
@@ -108,9 +109,10 @@
       </div>
 
       <div class="card">
-        <h2>サービス別 Dockerfile / ビルド設定</h2>
+        <h2>サービス別 Dockerfile / 追加設定ファイル</h2>
         <label>表示・保存するファイル：<select id="generatedFileSelect" aria-label="生成ファイル"></select></label>
         <p id="generatedFilePath" class="note"></p>
+        <button id="generatedBundleSaveBtn" type="button">生成ファイル一式を保存</button>
         <textarea id="dockerfileOutput" spellcheck="false"></textarea>
         <p id="generatedSaveStatus" class="note" role="status"></p>
         <div class="button-row">
@@ -147,7 +149,7 @@
       <!-- 左ペイン -->
       <nav class="settings-nav">
         <button class="settings-nav-item active" data-section="project">
-          プロジェクト
+          フォルダ設定
         </button>
         <button class="settings-nav-item" data-section="appearance">
           外観
@@ -158,7 +160,7 @@
       <section class="settings-content">
         <!-- プロジェクト -->
         <div id="settings-project" class="settings-section active">
-          <h3>プロジェクト設定</h3>
+          <h3>フォルダ設定</h3>
 
           <!-- プロジェクトフォルダ -->
           <div class="settings-field-row">
@@ -217,28 +219,18 @@
         <!-- 外観 -->
         <div id="settings-appearance" class="settings-section">
           <h3 id="settingsAppearanceTitle">外観設定</h3>
-          <p class="settings-appearance-description">テーマを選び、適用して配色を確認できます。保存するまで設定は変更されません。</p>
+          <p class="settings-appearance-description">テーマを選び「適用」を押すと、外観を変更して保存します。フォルダ設定の保存は不要です。</p>
           <div id="settingsThemeCards" class="settings-theme-grid" role="radiogroup" aria-label="テーマを選択"></div>
           <div class="settings-appearance-actions">
-            <button id="settingsApplyThemeButton" type="button" class="primary-button">適用して確認</button>
+            <button id="settingsApplyThemeButton" type="button" class="primary-button">適用</button>
             <p id="settingsThemeStatus" role="status" aria-live="polite"></p>
           </div>
-          <section class="settings-theme-preview" aria-labelledby="settingsPreviewThemeName">
-            <h4 id="settingsPreviewThemeName">配色見本</h4>
-            <div class="settings-preview-header" aria-hidden="true">Docker Builder Tool</div>
-            <div class="settings-preview-tabs" aria-hidden="true">
-              <span class="settings-preview-tab active">モジュール</span><span class="settings-preview-tab">構成入力</span><span class="settings-preview-tab">生成結果</span>
-            </div>
-            <div class="settings-preview-body" aria-hidden="true">
-              <span class="settings-preview-card">画面とカードの配色</span><span class="settings-preview-button">構成を生成</span>
-            </div>
-          </section>
+          <p id="settingsThemeError" class="field-hint error" role="alert"></p>
         </div>
 
         <p id="settingsSaveError" class="settings-save-error" role="alert" hidden></p>
         <div class="settings-footer">
           <button id="settingsSaveButton">保存</button>
-          <button id="settingsCancelButton" type="button" title="テーマの変更を取り消す（画面は閉じません）">キャンセル</button>
           <button id="settingsCloseButton" type="button">閉じる</button>
         </div>
       </section>
@@ -246,22 +238,26 @@
   </dialog>
 
   <!-- バージョン情報モーダルダイアログ -->
-  <dialog id="aboutDialog" class="app-dialog">
-    <form method="dialog" class="dialog-content">
-      <h2 class="dialog-title">バージョン情報</h2>
-      <div class="dialog-body">
-        <p class="dialog-description">
-          Docker 構成ジェネレータ（モジュール版）
-        </p>
-        <p class="note">
-          バージョン: <span id="aboutVersion">読み込み中...</span><br>
-          ログファイル: docker-builder.log<br>
-        </p>
-      </div>
-      <div class="dialog-footer">
-        <button id="aboutCloseButton" type="submit">閉じる</button>
-      </div>
-    </form>
+  <dialog id="aboutDialog" class="app-dialog about-dialog" aria-labelledby="aboutTitle" aria-describedby="aboutDescription">
+    <div class="about-content">
+      <header class="about-hero">
+        <img class="about-illustration" src="./assets/about-penguin-whale.png" alt="AIペンギンとDockerクジラの大冒険" width="1254" height="1254" />
+        <h2 id="aboutTitle">Docker Builder Tool</h2>
+        <p class="about-subtitle">Docker 構成ジェネレーター</p>
+        <span class="about-version-badge" aria-label="バージョン"><span id="aboutVersion">読み込み中...</span></span>
+      </header>
+      <section class="about-information" aria-label="アプリ情報">
+        <p id="aboutDescription">モジュールを選択して、Docker ComposeとDockerfileの構成を手軽に生成するデスクトップツール。</p>
+        <dl class="about-details">
+          <div><dt>開発者</dt><dd>qtaro-dev</dd></div>
+          <div><dt>GitHub</dt><dd><a id="aboutProjectLink" href="https://github.com/qtaro-dev/docker-builder-tool" aria-label="GitHubのプロジェクトページを外部ブラウザで開く">https://github.com/qtaro-dev/docker-builder-tool</a><span class="about-link-note">外部ブラウザで開きます</span></dd></div>
+          <div><dt>ライセンス</dt><dd id="aboutLicense">読み込み中...</dd></div>
+          <div><dt>ログファイル</dt><dd><code>docker-builder.log</code><span id="aboutLogPath" class="about-log-path">読み込み中...</span></dd></div>
+        </dl>
+        <p id="aboutLinkStatus" class="about-link-status" role="alert"></p>
+      </section>
+      <footer class="about-footer"><button id="aboutCloseButton" type="button" autofocus>閉じる</button></footer>
+    </div>
   </dialog>
 
   <!-- スクリプト -->

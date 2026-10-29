@@ -1,3 +1,4 @@
+// 既存生成試験の前提として、入力後に実UIの「設定確認」を明示操作する。
 // 実Electron画面の入力・ボタンとヘッドレス生成を照合。保存先選択だけOS境界で置換する。
 const fs=require('node:fs');
 const path=require('node:path');
@@ -17,7 +18,7 @@ module.exports=async({run,until,wc})=>{
       for(const [id,fields] of Object.entries(definition.config))for(const [name,value] of Object.entries(fields)){
         await run(`(()=>{const section=document.querySelector('section.card[data-module-id="${id}"]');const input=section.querySelector('input[data-field-name="${name}"],select[data-field-name="${name}"]');input.value=${JSON.stringify(String(value))};input.dispatchEvent(new Event('change'));if(${JSON.stringify(name)}==='framework'){const toggle=section.querySelector('.framework-toggle-checkbox');toggle.checked=${JSON.stringify(value)}==='flask';toggle.dispatchEvent(new Event('change'));}})()`);
       }
-      await run("document.getElementById('generateButton').click();document.querySelector('[data-tab=output]').click()");
+      await run("window.__testConfirmModules(); document.getElementById('generateButton').click();document.querySelector('[data-tab=output]').click()");
       assert.equal(await run("document.getElementById('composeOutput').value"),expected.compose,definition.id+' UI/headless Compose equality');
       const directory=path.join(__dirname,'manual-exports',definition.id);fs.mkdirSync(directory,{recursive:true});
       dialog.showSaveDialog=async()=>({canceled:false,filePath:path.join(directory,'docker-compose.yml')});

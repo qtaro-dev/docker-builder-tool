@@ -4,11 +4,13 @@ Docker / docker-compose の設定ファイルを GUI 操作で生成するため
 
 複数のミドルウェア（Web / DB / Cache / 管理ツール等）を選択し、docker-compose.yml を組み立てる用途を想定しています。
 
-次期開発版v0.3.0のイメージ選択・オンライン更新・サービス別保存の使い方と未検証事項は、[開発記録](docs/v0.3.0-development.md)を参照してください。公開済みの安定版はv0.2.2です。
+操作方法は[操作マニュアル](docs/manual/index.html)、構成例は[レシピ集](docs/manual/recipes.html)をご覧ください。開発・検証記録と旧資料は `docs/OLD/` に保管しています。
 
-生成した6構成をGitHub-hosted runnerでビルド・起動・HTTP/DB確認する[Docker検証CI](docs/docker-validation-ci.md)と、[UI操作・生成物の再現手順](docs/docker-validation-manual.md)を用意しています。ローカルDockerは不要です。実際のActions結果は手順書の実行記録を参照してください。
+次期開発版v0.3.0のイメージ選択・オンライン更新・サービス別保存の使い方と未検証事項は、[開発記録](docs/OLD/v0.3.0-development.md)を参照してください。公開済みの安定版はv0.2.2です。
 
-アプリ本体にはGitHub認証・トークン管理・生成物の送信・Actions起動を追加しません。[GitHub非連携方針と調査結果](docs/github-integration-policy.md)を参照してください。開発用CIとDocker Hub更新は維持します。
+生成した6構成をGitHub-hosted runnerでビルド・起動・HTTP/DB確認する[Docker検証CI](docs/OLD/docker-validation-ci.md)と、[UI操作・生成物の再現手順](docs/OLD/docker-validation-manual.md)を用意しています。ローカルDockerは不要です。実際のActions結果は手順書の実行記録を参照してください。
+
+アプリ本体にはGitHub認証・トークン管理・生成物の送信・Actions起動を追加しません。[GitHub非連携方針と調査結果](docs/OLD/github-integration-policy.md)を参照してください。開発用CIとDocker Hub更新は維持します。
 
 ---
 
@@ -89,15 +91,15 @@ npm start
 
 ### モジュール選択
 
-![Module Selection](docs/screenshots/main.png)
+![Module Selection](docs/manual/images/selected-light.png)
 
 ### モジュール設定入力画面
 
-![Configuration Input](docs/screenshots/generate_setting.png)
+![Configuration Input](docs/manual/images/accordion.png)
 
 ### 生成結果画面
 
-![Generated Result](docs/screenshots/generate_files.png)
+![Generated Result](docs/manual/images/nodejs-basic-output.png)
 
 ---
 

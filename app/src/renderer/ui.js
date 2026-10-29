@@ -141,6 +141,19 @@ function setupThemeToggle() {
 // [U03] 生成結果ボタン（ダウンロード/コピー/クリア）
 // ==============================
 function setupResultButtons() {
+  document.getElementById("generatedBundleSaveBtn").addEventListener("click", async () => {
+    const button = document.getElementById("generatedBundleSaveBtn");
+    const status = document.getElementById("generatedSaveStatus");
+    const compose = document.getElementById("composeOutput").value;
+    if (!compose.trim()) { status.textContent = "先に構成を生成してください。"; return; }
+    button.disabled = true;
+    try {
+      const projectName = window.__rendererCore.getCurrentProjectName();
+      const result = await window.electronAPI.saveGeneratedBundle([{relativePath:"docker-compose.yml",content:compose},...window.GeneratedFiles.all()], projectName);
+      status.textContent = result.error ? `保存に失敗しました：${result.error}` : result.canceled ? "保存をキャンセルしました。" : `生成ファイル一式を保存しました：${result.path}。${result.warning||''}利用者が準備するアプリ・依存ファイルは起動ガイドを確認してください。`;
+    } catch { status.textContent = "一式を保存できませんでした。保存先の権限・空き容量を確認してください。不完全な保存フォルダは使用せず、再保存してください。"; }
+    finally { button.disabled = false; }
+  });
   const pairs = [
     {
       downloadId: "composeDownloadBtn",
@@ -231,6 +244,8 @@ function openSettingsDialog() {
   function openAboutDialog() {
     const dlg = document.getElementById("aboutDialog");
     if (dlg && typeof dlg.showModal === "function") {
+      if (dlg.open) return;
+      document.getElementById("aboutLinkStatus").textContent = "";
       const update = window.__rendererAbout?.updateAboutVersion || window.updateAboutVersion;
       if (typeof update === "function") update();
       dlg.showModal();
@@ -254,6 +269,13 @@ function openSettingsDialog() {
     if (aboutClose && aboutDialog) {
       aboutClose.addEventListener("click", () => aboutDialog.close());
     }
+    document.getElementById("aboutProjectLink")?.addEventListener("click", async event => {
+      event.preventDefault();
+      const status = document.getElementById("aboutLinkStatus");
+      status.textContent = "";
+      try { await window.electronAPI.openProjectPage(); }
+      catch { status.textContent = "ブラウザを開けませんでした。既定のブラウザ設定を確認してください。"; }
+    });
 }
 // [U05] END
 
@@ -391,15 +413,17 @@ function updateAboutVersion() {
   }
 
   // バージョン取得要求
-  api
-    .getVersion()
-    .then((ver) => {
-      span.textContent = ver;
-    })
-    .catch((err) => {
-      console.error("バージョン取得に失敗:", err);
-      span.textContent = "取得エラー";
-    });
+  Promise.all([api.getVersion(), api.getAboutInfo()]).then(([version, info]) => {
+    span.textContent = info.displayVersion || version;
+    if (info.title) document.title = info.title;
+    document.getElementById("aboutLicense").textContent = info.license
+      ? `${info.license}（package.json の宣言）` : "未設定";
+    document.getElementById("aboutLogPath").textContent = info.logFilePath;
+  }).catch(() => {
+    span.textContent = "取得エラー";
+    document.getElementById("aboutLicense").textContent = "取得できませんでした";
+    document.getElementById("aboutLogPath").textContent = "保存先を取得できませんでした";
+  });
 }
 // [U10] END
 

@@ -47,6 +47,13 @@ async function generateConfigs() {
   const selectedIds = typeof getSelectedModuleIds === "function" ? getSelectedModuleIds() : [];
   const activeModules = moduleRegistry.filter((m) => selectedIds.includes(m.id));
 
+  // ボタンを経由しないメニュー/直接呼出しでも、未確認・変更済みの設定は生成しない。
+  if (!window.__rendererModulesUI?.areAllSettingsConfirmed()) {
+    window.__rendererUI.clearResultsOnly();
+    if (msg) { msg.textContent = "選択中の全モジュールの設定を確認し、「設定確認」にチェックしてください。"; msg.classList.add("port-message-error"); }
+    return;
+  }
+
   const validationErrors = [];
   const warnings = [];
   const runtimeErrors = [];

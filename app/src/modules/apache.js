@@ -11,6 +11,7 @@ registerModule({
   category: "web",
 
   fields: [
+    ...window.ProjectGeneration.webFields(),
     {
       name: "port",
       label: "公開ポート（ホスト側）",
