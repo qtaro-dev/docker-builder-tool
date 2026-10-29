@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  "redmine-postgresql-postgres":
+    image: "postgres:16.15-bookworm@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0"
+    restart: "always"
+    ports:
+      - "15432:5432"
+    volumes:
+      - "redmine-postgresql-postgres-data:/var/lib/postgresql/data"
+    environment:
+      - "POSTGRES_DB=appdb"
+      - "POSTGRES_USER=appuser"
+      - "POSTGRES_PASSWORD=demo-recipe-only-42"
+  "redmine-postgresql-redmine":
+    image: "redmine:7.0.2-bookworm@sha256:186090d8d6166fca3bb2eea3ccc8f3f6f03e906067cf0ce4364d0efa46dc99a2"
+    restart: "always"
+    ports:
+      - "13001:3000"
+    volumes:
+      - "redmine-postgresql-redmine-files:/usr/src/redmine/files"
+    environment:
+      - "REDMINE_DB_POSTGRES=redmine-postgresql-postgres"
+      - "REDMINE_DB_DATABASE=appdb"
+      - "REDMINE_DB_USERNAME=appuser"
+      - "REDMINE_DB_PASSWORD=demo-recipe-only-42"
+    depends_on:
+      - "redmine-postgresql-postgres"
+volumes:
+  "redmine-postgresql-postgres-data":
+  "redmine-postgresql-redmine-files":

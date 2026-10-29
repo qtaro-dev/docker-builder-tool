@@ -1,0 +1,944 @@
+[
+  {
+    "id": "nginx-basic",
+    "title": "Nginx単体",
+    "modules": [
+      "nginx"
+    ],
+    "projectName": "manual-nginx",
+    "configs": {
+      "nginx": {
+        "hostPort": 19080,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      }
+    },
+    "level": "初級",
+    "reason": "静的HTMLの配置と公開ポートを確認する構成で、アプリ間の接続コードを追加しません。"
+  },
+  {
+    "id": "apache-basic",
+    "title": "Apache単体",
+    "modules": [
+      "apache"
+    ],
+    "projectName": "manual-apache",
+    "configs": {
+      "apache": {
+        "port": 19082,
+        "dataStoreType": "bind",
+        "dataStoreName": "apache-docroot",
+        "dataStorePath": "./fixture-web"
+      }
+    },
+    "level": "初級",
+    "reason": "静的HTMLの配置とHTTP応答を確認する構成で、アプリ間の接続コードを追加しません。"
+  },
+  {
+    "id": "nodejs-basic",
+    "title": "Node.js単体",
+    "modules": [
+      "nodejs"
+    ],
+    "projectName": "manual-nodejs",
+    "configs": {
+      "nodejs": {
+        "hostPort": 19300,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      }
+    },
+    "level": "初級",
+    "reason": "付属の最小アプリを使い、package.json・lockfileの配置とHTTP応答を学びます。DB連携は扱いません。"
+  },
+  {
+    "id": "nginx-nodejs",
+    "title": "Nginx＋Node.js（独立HTTP）",
+    "modules": [
+      "nginx",
+      "nodejs"
+    ],
+    "projectName": "manual-nginx-nodejs",
+    "configs": {
+      "nginx": {
+        "hostPort": 19480,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "nodejs": {
+        "hostPort": 19400,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      }
+    },
+    "level": "初級",
+    "reason": "NginxとNode.jsを独立して動かす例です。リバースプロキシやDB連携は行いません。"
+  },
+  {
+    "id": "flask-basic",
+    "title": "Python Flask単体",
+    "modules": [
+      "python-web"
+    ],
+    "projectName": "manual-flask",
+    "configs": {
+      "python-web": {
+        "framework": "flask",
+        "hostPort": 19500,
+        "dataStoreType": "bind",
+        "dataStoreName": "python-app",
+        "dataStorePath": "./python-web",
+        "startCommand": ""
+      }
+    },
+    "level": "初級",
+    "reason": "付属の最小Flaskアプリと依存定義を配置し、単体のHTTP応答を確認します。"
+  },
+  {
+    "id": "postgresql-basic",
+    "title": "PostgreSQL単体",
+    "modules": [
+      "postgres"
+    ],
+    "projectName": "manual-postgres",
+    "configs": {
+      "postgres": {
+        "port": 19532,
+        "dbName": "ci_fixture",
+        "user": "ci_fixture",
+        "password": "ci-fixture-only-not-secret",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      }
+    },
+    "level": "初級",
+    "reason": "接続用の値と保存先を指定し、SQLの基本応答を確認する構成です。"
+  },
+  {
+    "id": "mysql-basic",
+    "title": "MySQL単体",
+    "modules": [
+      "mysql"
+    ],
+    "projectName": "mysql-basic",
+    "configs": {
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "初級",
+    "reason": "接続用の値と保存先を指定し、DB単体の基本操作を学びます。"
+  },
+  {
+    "id": "mariadb-basic",
+    "title": "MariaDB単体",
+    "modules": [
+      "mariadb"
+    ],
+    "projectName": "mariadb-basic",
+    "configs": {
+      "mariadb": {
+        "port": 13307,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mariadb-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "初級",
+    "reason": "接続用の値と保存先を指定し、DB単体の基本操作を学びます。"
+  },
+  {
+    "id": "redis-basic",
+    "title": "Redis単体",
+    "modules": [
+      "redis"
+    ],
+    "projectName": "redis-basic",
+    "configs": {
+      "redis": {
+        "port": 16379,
+        "dataStoreType": "named",
+        "dataStoreName": "redis-data",
+        "dataStorePath": "./redis-data"
+      }
+    },
+    "level": "初級",
+    "reason": "単体のキー保存・読出しと永続化の基礎を学ぶ構成です。"
+  },
+  {
+    "id": "memcached-basic",
+    "title": "Memcached単体",
+    "modules": [
+      "memcached"
+    ],
+    "projectName": "memcached-basic",
+    "configs": {
+      "memcached": {
+        "hostPort": 11211,
+        "dataStoreType": "named",
+        "dataStoreName": "memcached-data",
+        "dataStorePath": "./memcached-data",
+        "memoryMb": 64
+      }
+    },
+    "level": "中級",
+    "reason": "TCP接続用スクリプトと応答形式を扱い、キャッシュが揮発性であることを理解する必要があります。"
+  },
+  {
+    "id": "rabbitmq-basic",
+    "title": "RabbitMQ管理・キュー環境",
+    "modules": [
+      "rabbitmq"
+    ],
+    "projectName": "rabbitmq-basic",
+    "configs": {
+      "rabbitmq": {
+        "amqpPort": 15673,
+        "httpPort": 15674,
+        "dataStoreType": "named",
+        "dataStoreName": "rabbitmq-data",
+        "dataStorePath": "./rabbitmq-data"
+      }
+    },
+    "level": "中級",
+    "reason": "管理用ユーザーの初期化と権限、管理UIとキューの違いを理解する必要があります。"
+  },
+  {
+    "id": "jenkins-basic",
+    "title": "Jenkins開発・検証環境",
+    "modules": [
+      "jenkins"
+    ],
+    "projectName": "jenkins-basic",
+    "configs": {
+      "jenkins": {
+        "httpPort": 18088,
+        "agentPort": 15050,
+        "dataStoreType": "named",
+        "dataStoreName": "jenkins-home",
+        "dataStorePath": "./jenkins-home"
+      }
+    },
+    "level": "中級",
+    "reason": "初期管理者の設定とPipelineスクリプトを扱い、ジョブログから失敗箇所を調べます。"
+  },
+  {
+    "id": "ollama-basic",
+    "title": "Ollama APIの起動",
+    "modules": [
+      "ollama"
+    ],
+    "projectName": "ollama-basic",
+    "configs": {
+      "ollama": {
+        "port": 11434,
+        "dataStoreType": "named",
+        "dataStoreName": "ollama-data",
+        "dataStorePath": "./ollama-data",
+        "models": ""
+      }
+    },
+    "level": "中級",
+    "reason": "APIと保存領域を扱い、モデル利用へ進む際の容量・メモリなどの条件を判断します。"
+  },
+  {
+    "id": "portainer-ui",
+    "title": "Portainer初期画面",
+    "modules": [
+      "portainer"
+    ],
+    "projectName": "portainer-ui",
+    "configs": {
+      "portainer": {
+        "httpPort": 19000,
+        "httpsPort": 19443,
+        "dataStoreType": "named",
+        "dataStoreName": "portainer-data",
+        "dataStorePath": "./portainer-data"
+      }
+    },
+    "level": "中級",
+    "reason": "管理者の初期化と証明書・接続方式を扱います。初期UIの表示とDocker環境への管理接続を区別します。"
+  },
+  {
+    "id": "nginx-nodejs-mysql",
+    "title": "Nginx＋Node.js＋MySQL",
+    "modules": [
+      "nginx",
+      "nodejs",
+      "mysql"
+    ],
+    "projectName": "nginx-nodejs-mysql",
+    "configs": {
+      "nginx": {
+        "hostPort": 18080,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "上級",
+    "reason": "Nginx・アプリ・DBの3層を通し、プロキシ設定、接続コード、環境変数を横断して調整します。"
+  },
+  {
+    "id": "nginx-nodejs-mariadb",
+    "title": "Nginx＋Node.js＋MariaDB",
+    "modules": [
+      "nginx",
+      "nodejs",
+      "mariadb"
+    ],
+    "projectName": "nginx-nodejs-mariadb",
+    "configs": {
+      "nginx": {
+        "hostPort": 18080,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "mariadb": {
+        "port": 13307,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mariadb-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "上級",
+    "reason": "Nginx・アプリ・DBの3層を通し、プロキシ設定、接続コード、環境変数を横断して調整します。"
+  },
+  {
+    "id": "apache-nodejs-mysql",
+    "title": "Apache＋Node.js＋MySQL",
+    "modules": [
+      "apache",
+      "nodejs",
+      "mysql"
+    ],
+    "projectName": "apache-nodejs-mysql",
+    "configs": {
+      "apache": {
+        "port": 18082,
+        "dataStoreType": "bind",
+        "dataStoreName": "apache-docroot",
+        "dataStorePath": "./fixture-web"
+      },
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "上級",
+    "reason": "Apacheのプロキシ設定とNode.jsのSQL接続を組み合わせ、3層の通信経路を切り分けます。"
+  },
+  {
+    "id": "nodejs-postgresql",
+    "title": "Node.js＋PostgreSQL",
+    "modules": [
+      "nodejs",
+      "postgres"
+    ],
+    "projectName": "nodejs-postgresql",
+    "configs": {
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "postgres": {
+        "port": 15432,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "nodejs-redis",
+    "title": "Node.js＋Redis",
+    "modules": [
+      "nodejs",
+      "redis"
+    ],
+    "projectName": "nodejs-redis",
+    "configs": {
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "redis": {
+        "port": 16379,
+        "dataStoreType": "named",
+        "dataStoreName": "redis-data",
+        "dataStorePath": "./redis-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "flask-postgresql",
+    "title": "Flask＋PostgreSQL",
+    "modules": [
+      "python-web",
+      "postgres"
+    ],
+    "projectName": "flask-postgresql",
+    "configs": {
+      "python-web": {
+        "framework": "flask",
+        "hostPort": 15000,
+        "dataStoreType": "bind",
+        "dataStoreName": "python-app",
+        "dataStorePath": "./python-web",
+        "startCommand": ""
+      },
+      "postgres": {
+        "port": 15432,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "flask-redis",
+    "title": "Flask＋Redis",
+    "modules": [
+      "python-web",
+      "redis"
+    ],
+    "projectName": "flask-redis",
+    "configs": {
+      "python-web": {
+        "framework": "flask",
+        "hostPort": 15000,
+        "dataStoreType": "bind",
+        "dataStoreName": "python-app",
+        "dataStorePath": "./python-web",
+        "startCommand": ""
+      },
+      "redis": {
+        "port": 16379,
+        "dataStoreType": "named",
+        "dataStoreName": "redis-data",
+        "dataStorePath": "./redis-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "wordpress-mysql",
+    "title": "WordPress＋MySQL",
+    "modules": [
+      "wordpress",
+      "mysql"
+    ],
+    "projectName": "wordpress-mysql",
+    "configs": {
+      "wordpress": {
+        "port": 18090,
+        "dataStoreType": "named",
+        "dataStoreName": "wordpress-data",
+        "dataStorePath": "./wp-data"
+      },
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "wordpress-mariadb",
+    "title": "WordPress＋MariaDB",
+    "modules": [
+      "wordpress",
+      "mariadb"
+    ],
+    "projectName": "wordpress-mariadb",
+    "configs": {
+      "wordpress": {
+        "port": 18090,
+        "dataStoreType": "named",
+        "dataStoreName": "wordpress-data",
+        "dataStorePath": "./wp-data"
+      },
+      "mariadb": {
+        "port": 13307,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mariadb-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "laravel-mysql",
+    "title": "Laravel＋MySQL",
+    "modules": [
+      "laravel",
+      "mysql"
+    ],
+    "projectName": "laravel-mysql",
+    "configs": {
+      "laravel": {
+        "port": 18000,
+        "dataStoreType": "bind",
+        "dataStoreName": "laravel-app",
+        "dataStorePath": "./laravel",
+        "dbHost": "",
+        "dbName": "appdb",
+        "dbUser": "appuser",
+        "dbPassword": "demo-recipe-only-42"
+      },
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "上級",
+    "reason": "既存Laravelのソース、Composer依存、.env、APP_KEY、マイグレーション、書き込み権限を整える必要があります。"
+  },
+  {
+    "id": "laravel-postgresql",
+    "title": "Laravel＋PostgreSQL",
+    "modules": [
+      "laravel",
+      "postgres"
+    ],
+    "projectName": "laravel-postgresql",
+    "configs": {
+      "laravel": {
+        "port": 18000,
+        "dataStoreType": "bind",
+        "dataStoreName": "laravel-app",
+        "dataStorePath": "./laravel",
+        "dbHost": "",
+        "dbName": "appdb",
+        "dbUser": "appuser",
+        "dbPassword": "demo-recipe-only-42"
+      },
+      "postgres": {
+        "port": 15432,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      }
+    },
+    "level": "上級",
+    "reason": "既存Laravelの依存と初期化に加え、PostgreSQL向けの接続設定やマイグレーションを扱います。"
+  },
+  {
+    "id": "redmine-postgresql",
+    "title": "Redmine＋PostgreSQL",
+    "modules": [
+      "redmine",
+      "postgres"
+    ],
+    "projectName": "redmine-postgresql",
+    "configs": {
+      "redmine": {
+        "port": 13001,
+        "dataStoreType": "named",
+        "dataStoreName": "redmine-files",
+        "dataStorePath": "./redmine-files"
+      },
+      "postgres": {
+        "port": 15432,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "nodejs-mysql",
+    "title": "Node.js＋MySQL",
+    "modules": [
+      "nodejs",
+      "mysql"
+    ],
+    "projectName": "nodejs-mysql",
+    "configs": {
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "nodejs-mariadb",
+    "title": "Node.js＋MariaDB",
+    "modules": [
+      "nodejs",
+      "mariadb"
+    ],
+    "projectName": "nodejs-mariadb",
+    "configs": {
+      "nodejs": {
+        "hostPort": 13000,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "mariadb": {
+        "port": 13307,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mariadb-data",
+        "dataStorePath": "./db-data"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "mysql-phpmyadmin",
+    "title": "MySQL＋phpMyAdmin",
+    "modules": [
+      "mysql",
+      "phpmyadmin"
+    ],
+    "projectName": "mysql-phpmyadmin",
+    "configs": {
+      "mysql": {
+        "hostPort": 13306,
+        "database": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mysql-data",
+        "dataStorePath": "./db-data"
+      },
+      "phpmyadmin": {
+        "port": 18081,
+        "dbHost": "",
+        "dbUser": "appuser",
+        "dbPassword": "demo-recipe-only-42"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "mariadb-phpmyadmin",
+    "title": "MariaDB＋phpMyAdmin",
+    "modules": [
+      "mariadb",
+      "phpmyadmin"
+    ],
+    "projectName": "mariadb-phpmyadmin",
+    "configs": {
+      "mariadb": {
+        "port": 13307,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mariadb-data",
+        "dataStorePath": "./db-data"
+      },
+      "phpmyadmin": {
+        "port": 18081,
+        "dbHost": "",
+        "dbUser": "appuser",
+        "dbPassword": "demo-recipe-only-42"
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "nginx-flask",
+    "title": "Nginx＋Flask",
+    "modules": [
+      "nginx",
+      "python-web"
+    ],
+    "projectName": "nginx-flask",
+    "configs": {
+      "nginx": {
+        "hostPort": 18080,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "python-web": {
+        "framework": "flask",
+        "hostPort": 15000,
+        "dataStoreType": "bind",
+        "dataStoreName": "python-app",
+        "dataStorePath": "./python-web",
+        "startCommand": ""
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "apache-flask",
+    "title": "Apache＋Flask",
+    "modules": [
+      "apache",
+      "python-web"
+    ],
+    "projectName": "apache-flask",
+    "configs": {
+      "apache": {
+        "port": 18082,
+        "dataStoreType": "bind",
+        "dataStoreName": "apache-docroot",
+        "dataStorePath": "./fixture-web"
+      },
+      "python-web": {
+        "framework": "flask",
+        "hostPort": 15000,
+        "dataStoreType": "bind",
+        "dataStoreName": "python-app",
+        "dataStorePath": "./python-web",
+        "startCommand": ""
+      }
+    },
+    "level": "中級",
+    "reason": "サービス名による接続、環境変数、追加コードまたはプロキシ設定を扱い、サービス間の応答を確認します。"
+  },
+  {
+    "id": "nginx-nodejs-postgresql-redis",
+    "title": "Nginx＋Node.js＋PostgreSQL＋Redis",
+    "modules": [
+      "nginx",
+      "nodejs",
+      "postgres",
+      "redis"
+    ],
+    "projectName": "nginx-nodejs-postgresql-redis",
+    "configs": {
+      "nginx": {
+        "hostPort": 18180,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "nodejs": {
+        "hostPort": 13100,
+        "dataStoreType": "image",
+        "dataStoreName": "node-app",
+        "dataStorePath": "./nodejs",
+        "startCmd": "npm run dev"
+      },
+      "postgres": {
+        "port": 15442,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      },
+      "redis": {
+        "port": 16380,
+        "dataStoreType": "named",
+        "dataStoreName": "redis-data",
+        "dataStorePath": "./redis-data"
+      }
+    },
+    "level": "上級",
+    "reason": "リバースプロキシ、DB更新、キャッシュの失効とTTL、依存サービスの準備待ちを横断して扱います。"
+  },
+  {
+    "id": "nginx-flask-postgresql-redis",
+    "title": "Nginx＋Flask＋PostgreSQL＋Redis",
+    "modules": [
+      "nginx",
+      "python-web",
+      "postgres",
+      "redis"
+    ],
+    "projectName": "nginx-flask-postgresql-redis",
+    "configs": {
+      "nginx": {
+        "hostPort": 18280,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "python-web": {
+        "framework": "flask",
+        "hostPort": 15100,
+        "dataStoreType": "bind",
+        "dataStoreName": "python-app",
+        "dataStorePath": "./python-web",
+        "startCommand": ""
+      },
+      "postgres": {
+        "port": 15443,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "postgres-data",
+        "dataStorePath": "./pg-data"
+      },
+      "redis": {
+        "port": 16381,
+        "dataStoreType": "named",
+        "dataStoreName": "redis-data",
+        "dataStorePath": "./redis-data"
+      }
+    },
+    "level": "上級",
+    "reason": "Pythonアプリ・DB・Redisの接続、DB更新後のキャッシュ失効、プロキシと準備待ちを横断して扱います。"
+  },
+  {
+    "id": "nginx-wordpress-mariadb-admin",
+    "title": "Nginx＋WordPress＋MariaDB＋phpMyAdmin",
+    "modules": [
+      "nginx",
+      "wordpress",
+      "mariadb",
+      "phpmyadmin"
+    ],
+    "projectName": "nginx-wordpress-mariadb-admin",
+    "configs": {
+      "nginx": {
+        "hostPort": 18380,
+        "dataStoreType": "bind",
+        "dataStoreName": "nginx-html",
+        "dataStorePath": "./fixture-web"
+      },
+      "wordpress": {
+        "port": 18092,
+        "dataStoreType": "named",
+        "dataStoreName": "wordpress-data",
+        "dataStorePath": "./wp-data"
+      },
+      "mariadb": {
+        "port": 13309,
+        "dbName": "appdb",
+        "user": "appuser",
+        "password": "demo-recipe-only-42",
+        "dataStoreType": "named",
+        "dataStoreName": "mariadb-data",
+        "dataStorePath": "./db-data"
+      },
+      "phpmyadmin": {
+        "port": 18083,
+        "dbHost": "nginx-wordpress-mariadb-admin-mariadb",
+        "dbUser": "appuser",
+        "dbPassword": "demo-recipe-only-42"
+      }
+    },
+    "level": "上級",
+    "reason": "公開URLとプロキシの整合、DB管理、DBとWordPressファイルの両方のバックアップ・別環境への復旧を扱います。"
+  }
+]

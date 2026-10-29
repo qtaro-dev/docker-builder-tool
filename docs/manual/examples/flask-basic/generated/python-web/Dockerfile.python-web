@@ -1,0 +1,9 @@
+# Framework: Flask
+FROM python:3.14.9-slim-bookworm@sha256:945c2676dc2b18e0c1f16879244122c57c0ffede60006bf3df159c507a31bcae
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+ENV FRAMEWORK=flask
+EXPOSE 5000
+CMD ["sh","-c","flask run --host=0.0.0.0 --port=5000"]

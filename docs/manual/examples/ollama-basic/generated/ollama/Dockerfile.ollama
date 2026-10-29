@@ -1,0 +1,3 @@
+FROM ollama/ollama:0.40.11@sha256:dea72d1e22270fe095b68fdf756d2b489d615643c5a2eaebbc5f569181e322d8
+# このサービス用の追加設定を記述できます。
+

@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-postgresql",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.cjs"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
+  }
+}

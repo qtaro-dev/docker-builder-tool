@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  "manual-nodejs-nodejs":
+    build:
+      context: "./nodejs"
+      dockerfile: "Dockerfile.nodejs"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "19300:3000"
+    command: ["sh","-c","npm run dev"]

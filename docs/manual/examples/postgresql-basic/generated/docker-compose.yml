@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  "manual-postgres-postgres":
+    image: "postgres:16.15-bookworm@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0"
+    restart: "always"
+    ports:
+      - "19532:5432"
+    volumes:
+      - "manual-postgres-postgres-data:/var/lib/postgresql/data"
+    environment:
+      - "POSTGRES_DB=ci_fixture"
+      - "POSTGRES_USER=ci_fixture"
+      - "POSTGRES_PASSWORD=ci-fixture-only-not-secret"
+volumes:
+  "manual-postgres-postgres-data":

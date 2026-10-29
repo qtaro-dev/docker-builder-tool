@@ -1,0 +1,11 @@
+FROM php:8.4.27-cli-bookworm@sha256:496b5e02fe9fe44fcfb715023b931048111dc4e0bc719789d83c906be9f04b05
+# Laravel開発用。composer.lockとPHP拡張の要件を確認してください。
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip libicu-dev libonig-dev libzip-dev libpq-dev \
+    && docker-php-ext-install pdo_mysql pdo_pgsql intl mbstring zip bcmath opcache \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=composer:2.10.3@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc /usr/bin/composer /usr/bin/composer
+WORKDIR /app
+COPY . .
+RUN composer install --prefer-dist --no-interaction --no-progress
+EXPOSE 8000
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

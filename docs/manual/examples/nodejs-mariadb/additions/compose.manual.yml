@@ -1,0 +1,7 @@
+services:
+  nodejs-mariadb-nodejs:
+    environment:
+      DB_HOST: nodejs-mariadb-mariadb
+      DB_NAME: appdb
+      DB_USER: appuser
+      DB_PASSWORD: demo-recipe-only-42

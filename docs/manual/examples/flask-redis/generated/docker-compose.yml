@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  "flask-redis-redis":
+    image: "redis:7.4.11-alpine@sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541"
+    restart: "always"
+    ports:
+      - "16379:6379"
+    volumes:
+      - "flask-redis-redis-data:/data"
+  "flask-redis-flask":
+    build:
+      context: "./python-web"
+      dockerfile: "Dockerfile.python-web"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "15000:5000"
+    volumes:
+      - "./python-web:/app"
+    environment:
+      - "FRAMEWORK=flask"
+    command: ["sh","-c","flask run --host=0.0.0.0 --port=5000"]
+volumes:
+  "flask-redis-redis-data":

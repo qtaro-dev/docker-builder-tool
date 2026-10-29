@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  "wordpress-mariadb-mariadb":
+    image: "mariadb:11.4.13@sha256:250e1609e93c0e6aecf64bfbab2d84d5e89d2481540fe77447ff6c855c3b1873"
+    restart: "always"
+    ports:
+      - "13307:3306"
+    volumes:
+      - "wordpress-mariadb-mariadb-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+  "wordpress-mariadb-wordpress":
+    image: "wordpress:7.1.3-php8.4-apache@sha256:edbfa4a140f7c5950435f5737538ad83d25af4661b74b990d7ec1eff3bec99a8"
+    restart: "always"
+    ports:
+      - "18090:80"
+    volumes:
+      - "wordpress-mariadb-wordpress-data:/var/www/html"
+    environment:
+      - "WORDPRESS_DB_HOST=wordpress-mariadb-mariadb"
+      - "WORDPRESS_DB_NAME=appdb"
+      - "WORDPRESS_DB_USER=appuser"
+      - "WORDPRESS_DB_PASSWORD=demo-recipe-only-42"
+    depends_on:
+      - "wordpress-mariadb-mariadb"
+volumes:
+  "wordpress-mariadb-mariadb-data":
+  "wordpress-mariadb-wordpress-data":

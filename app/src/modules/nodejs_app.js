@@ -24,12 +24,13 @@ registerModule({
     // === データ保存方式（アプリ領域）===
     {
       name: "dataStoreType",
-      label: "データ保存方式",
+      label: "アプリの配置方式（データ保存方式）",
       type: "select",
-      default: "named",
+      default: "image",
       options: [
-        { value: "named", label: "名前付きボリューム（推奨）" },
-        { value: "bind", label: "バインドマウント（ホストパス）" },
+        { value: "image", label: "イメージ内に含める（標準・ソースを隠さない）" },
+        { value: "bind", label: "開発用バインドマウント（ホストソース）" },
+        { value: "named", label: "名前付きボリューム（旧構成との互換用）" },
       ],
     },
     {
@@ -44,8 +45,8 @@ registerModule({
       name: "dataStorePath",
       label: "バインドマウント（ホストパス）",
       type: "text",
-      default: "./node-app",
-      placeholder: "./node-app",
+      default: "./nodejs",
+      placeholder: "./nodejs",
       visibleWhen: { field: "dataStoreType", equals: "bind" },
       isDir: true,
       browseEnabledWhen: { field: "dataStoreType", equals: "bind" },
@@ -55,8 +56,8 @@ registerModule({
       name: "startCmd",
       label: "起動コマンド（sh -c で実行）",
       type: "text",
-      default: "npm install && npm run dev",
-      placeholder: "npm install && npm run dev",
+      default: "npm run dev",
+      placeholder: "npm run dev",
     },
   ],
 
@@ -68,13 +69,15 @@ registerModule({
     const volumes = [];
     const namedVolumes = [];
 
-    const storeType = String(config.dataStoreType || "named");
+    const storeType = String(config.dataStoreType || "image");
     const storeName = String(config.dataStoreName || "node-app").trim();
-    const storePath = String(config.dataStorePath || "./node-app").trim();
+    const storePath = String(config.dataStorePath || "./nodejs").trim().replace(/\\/g, "/");
 
     if (storeType === "bind") {
       volumes.push(`${storePath}:/app`);
-    } else {
+      // ホスト側のnode_modulesでLinux向けのビルド済み依存を隠さない。
+      volumes.push("/app/node_modules");
+    } else if (storeType === "named") {
       const key = (storeName || "node-app").replace(/[^\w.-]/g, "-");
       const volName = `${projectName}-${key}`;
       volumes.push(`${volName}:/app`);
@@ -88,9 +91,10 @@ registerModule({
           image: "node:20-alpine",
           restart: "always",
           working_dir: "/app",
-          ports: [`${hostPort}:${hostPort}`],
+          ports: [`${hostPort}:3000`],
           volumes,
-          command: ["sh", "-c", String(config.startCmd || "npm install && npm run dev")],
+          // 明示的な旧/カスタムコマンドは変更せず、未指定時だけ新しい既定値を使う。
+          command: ["sh", "-c", String(config.startCmd || "npm run dev")],
         },
       ],
       volumes: namedVolumes,
@@ -98,15 +102,8 @@ registerModule({
   },
 
   buildDockerfile(config = {}) {
-    // 任意：開発用のシンプルな Dockerfile（未使用でもOK）
-    return [
-      "FROM node:20-alpine",
-      "WORKDIR /app",
-      "COPY . .",
-      "RUN npm install",
-      "EXPOSE 3000",
-      'CMD ["npm","run","dev"]',
-      "",
-    ].join("\n");
+    // FROMと依存インストールは共通生成処理に集約する。
+    if (!config.imageVersion) return "";
+    return window.ProjectGeneration.dockerfile("nodejs", config, config.imageVersion, config.composerVersion);
   },
 });

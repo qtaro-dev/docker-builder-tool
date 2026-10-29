@@ -1,0 +1,702 @@
+{
+  "mode": "docker",
+  "sourceRevision": "50d2e76095a6330783c817101635376d5bb89070",
+  "rows": [
+    {
+      "id": "nginx-basic",
+      "title": "Nginx単体",
+      "batch": 1,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "nginx HTTP/proxy"
+      ]
+    },
+    {
+      "id": "apache-basic",
+      "title": "Apache単体",
+      "batch": 1,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "apache HTTP/proxy"
+      ]
+    },
+    {
+      "id": "nodejs-basic",
+      "title": "Node.js単体",
+      "batch": 1,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "nodejs HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "nginx-nodejs",
+      "title": "Nginx＋Node.js（独立HTTP）",
+      "batch": 1,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "nodejs HTTP/dependency response",
+        "nginx independent HTTP"
+      ]
+    },
+    {
+      "id": "flask-basic",
+      "title": "Python Flask単体",
+      "batch": 1,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "python-web HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "postgresql-basic",
+      "title": "PostgreSQL単体",
+      "batch": 1,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42"
+      ]
+    },
+    {
+      "id": "mysql-basic",
+      "title": "MySQL単体",
+      "batch": 2,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42"
+      ]
+    },
+    {
+      "id": "mariadb-basic",
+      "title": "MariaDB単体",
+      "batch": 2,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mariadb SQL write/read=42"
+      ]
+    },
+    {
+      "id": "redis-basic",
+      "title": "Redis単体",
+      "batch": 2,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "Redis SET/GET"
+      ]
+    },
+    {
+      "id": "memcached-basic",
+      "title": "Memcached単体",
+      "batch": 2,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "Memcached TCP SET/GET"
+      ]
+    },
+    {
+      "id": "rabbitmq-basic",
+      "title": "RabbitMQ管理・キュー環境",
+      "batch": 2,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "RabbitMQ authenticated queue publish/get"
+      ]
+    },
+    {
+      "id": "jenkins-basic",
+      "title": "Jenkins開発・検証環境",
+      "batch": 2,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "Jenkins起動・初期UI。プラグイン/管理者設定後のPipeline実行はこの起動検査の対象外",
+      "reason": "",
+      "evidence": [
+        "Jenkins initial UI; Pipeline execution outside startup-test scope"
+      ]
+    },
+    {
+      "id": "ollama-basic",
+      "title": "Ollama APIの起動",
+      "batch": 3,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "Ollama起動・API。モデル取得・推論はレシピ自体の対象外",
+      "reason": "",
+      "evidence": [
+        "Ollama tags API (no inference)"
+      ]
+    },
+    {
+      "id": "portainer-ui",
+      "title": "Portainer初期画面",
+      "batch": 3,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "Portainer初期UI/API。Docker管理接続はレシピ自体の対象外",
+      "reason": "",
+      "evidence": [
+        "Portainer HTTPS status API (no Docker management connection)"
+      ]
+    },
+    {
+      "id": "nginx-nodejs-mysql",
+      "title": "Nginx＋Node.js＋MySQL",
+      "batch": 3,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42",
+        "nodejs HTTP/dependency response",
+        "nginx HTTP/proxy"
+      ]
+    },
+    {
+      "id": "nginx-nodejs-mariadb",
+      "title": "Nginx＋Node.js＋MariaDB",
+      "batch": 3,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mariadb SQL write/read=42",
+        "nodejs HTTP/dependency response",
+        "nginx HTTP/proxy"
+      ]
+    },
+    {
+      "id": "apache-nodejs-mysql",
+      "title": "Apache＋Node.js＋MySQL",
+      "batch": 3,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42",
+        "nodejs HTTP/dependency response",
+        "apache HTTP/proxy"
+      ]
+    },
+    {
+      "id": "nodejs-postgresql",
+      "title": "Node.js＋PostgreSQL",
+      "batch": 3,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42",
+        "nodejs HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "nodejs-redis",
+      "title": "Node.js＋Redis",
+      "batch": 4,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "Redis SET/GET",
+        "nodejs HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "flask-postgresql",
+      "title": "Flask＋PostgreSQL",
+      "batch": 4,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42",
+        "python-web HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "flask-redis",
+      "title": "Flask＋Redis",
+      "batch": 4,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "Redis SET/GET",
+        "python-web HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "wordpress-mysql",
+      "title": "WordPress＋MySQL",
+      "batch": 4,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42",
+        "WordPress install/post/query through configured HTTP→DB"
+      ]
+    },
+    {
+      "id": "wordpress-mariadb",
+      "title": "WordPress＋MariaDB",
+      "batch": 4,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mariadb SQL write/read=42",
+        "WordPress install/post/query through configured HTTP→DB"
+      ]
+    },
+    {
+      "id": "laravel-mysql",
+      "title": "Laravel＋MySQL",
+      "batch": 4,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "実LaravelのHTTP→DB接続（フレームワーク/依存の準備が必要）",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42",
+        "Laravel 12.70.1 real HTTP and application DB temporary-table insert/select sum=42"
+      ]
+    },
+    {
+      "id": "laravel-postgresql",
+      "title": "Laravel＋PostgreSQL",
+      "batch": 5,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "実LaravelのHTTP→DB接続（フレームワーク/依存の準備が必要）",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42",
+        "Laravel 12.70.1 real HTTP and application DB temporary-table insert/select sum=42"
+      ]
+    },
+    {
+      "id": "redmine-postgresql",
+      "title": "Redmine＋PostgreSQL",
+      "batch": 5,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42",
+        "Redmine UI and application DB connection"
+      ]
+    },
+    {
+      "id": "nodejs-mysql",
+      "title": "Node.js＋MySQL",
+      "batch": 5,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42",
+        "nodejs HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "nodejs-mariadb",
+      "title": "Node.js＋MariaDB",
+      "batch": 5,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mariadb SQL write/read=42",
+        "nodejs HTTP/dependency response"
+      ]
+    },
+    {
+      "id": "mysql-phpmyadmin",
+      "title": "MySQL＋phpMyAdmin",
+      "batch": 5,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mysql SQL write/read=42",
+        "phpMyAdmin UI and container→DB authenticated query"
+      ]
+    },
+    {
+      "id": "mariadb-phpmyadmin",
+      "title": "MariaDB＋phpMyAdmin",
+      "batch": 5,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "mariadb SQL write/read=42",
+        "phpMyAdmin UI and container→DB authenticated query"
+      ]
+    },
+    {
+      "id": "nginx-flask",
+      "title": "Nginx＋Flask",
+      "batch": 6,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "python-web HTTP/dependency response",
+        "nginx HTTP/proxy"
+      ]
+    },
+    {
+      "id": "apache-flask",
+      "title": "Apache＋Flask",
+      "batch": 6,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "全サービスの起動、HTTPまたはDB/キャッシュ応答、レシピに記載した連携",
+      "reason": "",
+      "evidence": [
+        "python-web HTTP/dependency response",
+        "apache HTTP/proxy"
+      ]
+    },
+    {
+      "id": "nginx-nodejs-postgresql-redis",
+      "title": "Nginx＋Node.js＋PostgreSQL＋Redis",
+      "batch": 6,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "HTTP→プロキシ→アプリ→DB/Redis、更新・失効・TTL・障害/回復",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42",
+        "Redis SET/GET",
+        "nginx HTTP/proxy",
+        "proxy→app→DB/cache; write/read/invalidate/TTL; Redis outage/fallback/recovery"
+      ]
+    },
+    {
+      "id": "nginx-flask-postgresql-redis",
+      "title": "Nginx＋Flask＋PostgreSQL＋Redis",
+      "batch": 6,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "PASS",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "HTTP→プロキシ→アプリ→DB/Redis、更新・失効・TTL・障害/回復",
+      "reason": "",
+      "evidence": [
+        "postgres SQL write/read=42",
+        "Redis SET/GET",
+        "nginx HTTP/proxy",
+        "proxy→app→DB/cache; write/read/invalidate/TTL; Redis outage/fallback/recovery"
+      ]
+    },
+    {
+      "id": "nginx-wordpress-mariadb-admin",
+      "title": "Nginx＋WordPress＋MariaDB＋phpMyAdmin",
+      "batch": 6,
+      "status": "OK",
+      "generation": "PASS",
+      "preparation": "PASS",
+      "compose": "PASS",
+      "pull": "PASS",
+      "build": "N/A",
+      "up": "PASS",
+      "response": "PASS",
+      "cleanup": "PASS",
+      "scope": "プロキシ・CMS/DB・管理UI・バックアップと別プロジェクトへの復旧",
+      "reason": "",
+      "evidence": [
+        "mariadb SQL write/read=42",
+        "phpMyAdmin UI and container→DB authenticated query",
+        "WordPress install/post/query through configured HTTP→DB",
+        "real backup.ps1 and restore into separate Compose project; restored post visible"
+      ]
+    }
+  ]
+}

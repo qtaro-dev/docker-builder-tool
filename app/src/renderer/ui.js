@@ -112,63 +112,26 @@ function setupTabs() {
 // [U02] テーマ切り替え
 // ==============================
 function setupThemeToggle() {
-  const api = window.electronAPI;
-
+  const core = window.__rendererCore;
   const btn = document.getElementById("themeToggleButton");
-  if (!btn) return;
-
-  const html = document.documentElement;
-  let current = html.getAttribute("data-theme") || "light";
-
-  // 「現在のテーマ名」を表示するマップ（外に出す）
-  const map = {
-    system: "🖥 自動",
-    light:  "☀ ライト",
-    dark:   "🌙 ダーク",
-    blue:   "🔵 青",
-    green:  "🟢 緑",
-    yellow: "🟡 黄",
-    orange: "🟠 オレンジ",
-    red:    "🔴 赤",
-    pink:   "🌸 ピンク",
-  };
-
+  if (!btn || !core) return;
   const order = ["light", "dark", "blue", "green", "yellow", "orange", "red", "pink"];
+  core.applyTheme(core.getTheme());
 
-  const updateLabel = () => {
-    btn.textContent = map[current] || "テーマ";
-  };
-
-  const syncToSettingsUI = () => {
-    const sTheme = document.getElementById("settingsTheme");
-    if (sTheme) sTheme.value = current;
-  };
-
-  // 保存（await を使うので async にする）
-  const saveTheme = async () => {
-    try { await api?.saveSettings({ theme: current }); }
-    catch (err) { console.error("テーマ設定の保存に失敗:", err); }
-  };
-
-  // 初期表示
-  updateLabel();
-  syncToSettingsUI();
-
-  // クリック：次のテーマへ → 反映 → 保存 → UI同期
+  // 現在値は共通処理から取得し、設定画面で適用した後も矛盾させない。
   btn.addEventListener("click", async () => {
-    const idx = Math.max(0, order.indexOf(current));
-    current = order[(idx + 1) % order.length];
-
-    html.setAttribute("data-theme", current);
-    updateLabel();
-
-    await saveTheme();
-    syncToSettingsUI();
+    if (document.getElementById("settingsDialog")?.open) return;
+    const previous = core.getTheme();
+    const current = previous === "system" ? core.getEffectiveTheme() : previous;
+    const next = order[(Math.max(0, order.indexOf(current)) + 1) % order.length];
+    btn.disabled = true;
+    core.applyTheme(next);
+    try { await window.electronAPI?.saveSettings({ theme: next }); }
+    catch (err) {
+      core.applyTheme(previous);
+      console.error("テーマ設定の保存に失敗:", err);
+    } finally { btn.disabled = false; }
   });
-
-  // ここで保存したいなら、await せずに呼ぶ（非同期で投げる）
-  // 例：起動直後に data-theme を確定させた後に保存したい場合のみ
-  // saveTheme();
 }
 
 // [U02] END
@@ -178,6 +141,19 @@ function setupThemeToggle() {
 // [U03] 生成結果ボタン（ダウンロード/コピー/クリア）
 // ==============================
 function setupResultButtons() {
+  document.getElementById("generatedBundleSaveBtn").addEventListener("click", async () => {
+    const button = document.getElementById("generatedBundleSaveBtn");
+    const status = document.getElementById("generatedSaveStatus");
+    const compose = document.getElementById("composeOutput").value;
+    if (!compose.trim()) { status.textContent = "先に構成を生成してください。"; return; }
+    button.disabled = true;
+    try {
+      const projectName = window.__rendererCore.getCurrentProjectName();
+      const result = await window.electronAPI.saveGeneratedBundle([{relativePath:"docker-compose.yml",content:compose},...window.GeneratedFiles.all()], projectName);
+      status.textContent = result.error ? `保存に失敗しました：${result.error}` : result.canceled ? "保存をキャンセルしました。" : `生成ファイル一式を保存しました：${result.path}。${result.warning||''}利用者が準備するアプリ・依存ファイルは起動ガイドを確認してください。`;
+    } catch { status.textContent = "一式を保存できませんでした。保存先の権限・空き容量を確認してください。不完全な保存フォルダは使用せず、再保存してください。"; }
+    finally { button.disabled = false; }
+  });
   const pairs = [
     {
       downloadId: "composeDownloadBtn",
@@ -204,7 +180,11 @@ function setupResultButtons() {
     if (dlBtn) {
       dlBtn.addEventListener("click", async () => {
         try {
-          await window.electronAPI.saveGeneratedFile(p.filename, textarea.value || "");
+          const selected = p.textareaId === "dockerfileOutput" ? window.GeneratedFiles.current() : null;
+          if (p.textareaId === "dockerfileOutput" && !selected) return;
+          const result = await window.electronAPI.saveGeneratedFile(selected?.filename || p.filename, textarea.value || "");
+          const status = document.getElementById("generatedSaveStatus");
+          status.textContent = result.canceled ? "保存をキャンセルしました。" : `保存先：${result.path || "選択したファイル"}${result.placementWarning ? "\n注意：" + result.placementWarning : "\n必要な配置は「構成ファイルの配置・起動ガイド」を確認してください。"}`;
         } catch (err) {
           console.error("ファイルの保存に失敗:", err);
           alert("ファイルの保存に失敗しました。保存先の権限や空き容量を確認してください。");
@@ -225,6 +205,7 @@ function setupResultButtons() {
     if (clearBtn) {
       clearBtn.addEventListener("click", () => {
         textarea.value = "";
+        if (p.textareaId === "composeOutput") window.GenerationGuideUI.clear();
       });
     }
   });
@@ -253,6 +234,8 @@ function setupGenerateButton() {
 function openSettingsDialog() {
   const dlg = document.getElementById("settingsDialog");
   if (dlg && typeof dlg.showModal === "function") {
+    if (dlg.open) return;
+    window.__rendererSettings.beginSettingsSession();
     dlg.showModal();
   }
 }
@@ -261,6 +244,8 @@ function openSettingsDialog() {
   function openAboutDialog() {
     const dlg = document.getElementById("aboutDialog");
     if (dlg && typeof dlg.showModal === "function") {
+      if (dlg.open) return;
+      document.getElementById("aboutLinkStatus").textContent = "";
       const update = window.__rendererAbout?.updateAboutVersion || window.updateAboutVersion;
       if (typeof update === "function") update();
       dlg.showModal();
@@ -273,24 +258,24 @@ function openSettingsDialog() {
  */
   // ダイアログ閉じるボタン設定
   function setupDialogs() {
-    const settingsDialog = document.getElementById("settingsDialog");
     const aboutDialog = document.getElementById("aboutDialog");
-
-    const settingsClose =
-      document.getElementById("settingsCloseButton") ||
-      document.getElementById("settingsCancelButton");
 
     const aboutClose = document.getElementById("aboutCloseButton");
   
   // 閉じるイベント登録
-    if (settingsClose && settingsDialog) {
-      settingsClose.addEventListener("click", () => settingsDialog.close());
-    }
+    // 設定画面の終了・取り消し処理は settings.js に一本化する。
 
   // About 閉じるイベント登録
     if (aboutClose && aboutDialog) {
       aboutClose.addEventListener("click", () => aboutDialog.close());
     }
+    document.getElementById("aboutProjectLink")?.addEventListener("click", async event => {
+      event.preventDefault();
+      const status = document.getElementById("aboutLinkStatus");
+      status.textContent = "";
+      try { await window.electronAPI.openProjectPage(); }
+      catch { status.textContent = "ブラウザを開けませんでした。既定のブラウザ設定を確認してください。"; }
+    });
 }
 // [U05] END
 
@@ -298,6 +283,7 @@ function openSettingsDialog() {
 // [U06] 生成結果のみクリア
 // ==============================
 function clearResultsOnly() {
+  window.GeneratedFiles?.set([]);
   const composeOutput = document.getElementById("composeOutput");
   const dockerfileOutput = document.getElementById("dockerfileOutput");
   if (composeOutput) composeOutput.value = "";
@@ -328,7 +314,8 @@ function resetConfiguration() {
   // 構成入力エリア再描画
   const renderConfigSections =
     window.__rendererModulesUI?.renderConfigSections || window.renderConfigSections;
-  if (typeof renderConfigSections === "function") renderConfigSections();
+  window.ImageUI?.reset();
+  if (typeof renderConfigSections === "function") renderConfigSections(true);
 
   // ポートメッセージなどリセット
   const msg = document.getElementById("portMessage");
@@ -426,15 +413,17 @@ function updateAboutVersion() {
   }
 
   // バージョン取得要求
-  api
-    .getVersion()
-    .then((ver) => {
-      span.textContent = ver;
-    })
-    .catch((err) => {
-      console.error("バージョン取得に失敗:", err);
-      span.textContent = "取得エラー";
-    });
+  Promise.all([api.getVersion(), api.getAboutInfo()]).then(([version, info]) => {
+    span.textContent = info.displayVersion || version;
+    if (info.title) document.title = info.title;
+    document.getElementById("aboutLicense").textContent = info.license
+      ? `${info.license}（package.json の宣言）` : "未設定";
+    document.getElementById("aboutLogPath").textContent = info.logFilePath;
+  }).catch(() => {
+    span.textContent = "取得エラー";
+    document.getElementById("aboutLicense").textContent = "取得できませんでした";
+    document.getElementById("aboutLogPath").textContent = "保存先を取得できませんでした";
+  });
 }
 // [U10] END
 
@@ -456,6 +445,8 @@ function bootstrapApp() {
 
   setupGenerateButton();
   setupResultButtons();
+  window.GeneratedFiles.bind();
+  window.GenerationGuideUI.bind();
   setupThemeToggle();
 
   // ダイアログ（閉じる）

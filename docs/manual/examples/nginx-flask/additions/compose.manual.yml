@@ -1,0 +1,8 @@
+services:
+  nginx-flask-flask:
+    environment: {}
+  nginx-flask-nginx:
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - nginx-flask-flask

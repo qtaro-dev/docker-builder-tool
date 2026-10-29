@@ -1,0 +1,11 @@
+{
+  "name": "nginx-nodejs-mysql",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.cjs"
+  },
+  "dependencies": {
+    "mysql2": "3.24.6"
+  }
+}

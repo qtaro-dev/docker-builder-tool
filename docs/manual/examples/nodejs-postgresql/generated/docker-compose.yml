@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  "nodejs-postgresql-postgres":
+    image: "postgres:16.15-bookworm@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0"
+    restart: "always"
+    ports:
+      - "15432:5432"
+    volumes:
+      - "nodejs-postgresql-postgres-data:/var/lib/postgresql/data"
+    environment:
+      - "POSTGRES_DB=appdb"
+      - "POSTGRES_USER=appuser"
+      - "POSTGRES_PASSWORD=demo-recipe-only-42"
+  "nodejs-postgresql-nodejs":
+    build:
+      context: "./nodejs"
+      dockerfile: "Dockerfile.nodejs"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "13000:3000"
+    command: ["sh","-c","npm run dev"]
+volumes:
+  "nodejs-postgresql-postgres-data":

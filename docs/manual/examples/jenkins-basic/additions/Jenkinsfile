@@ -1,0 +1,8 @@
+// 利用者がJenkinsのPipelineジョブのスクリプトへ貼り付ける。
+pipeline {
+  agent any
+  stages {
+    stage('Check Java') { steps { sh 'java -version' } }
+    stage('Check workspace') { steps { sh 'pwd; echo recipe-check-ok' } }
+  }
+}

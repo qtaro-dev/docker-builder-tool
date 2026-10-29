@@ -5,12 +5,13 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function load() {
-  const window = {};
+  const window = {ProjectGeneration:require('../app/src/project-generation')};
   const modules = [];
   const context = vm.createContext({ window, registerModule: m => modules.push(m) });
   for (const file of fs.readdirSync(path.join(__dirname, "../app/src/modules"))) {
     if (file.endsWith(".js")) vm.runInContext(fs.readFileSync(path.join(__dirname, "../app/src/modules", file), "utf8"), context, { filename: file });
   }
+  vm.runInContext(fs.readFileSync(path.join(__dirname, "../app/src/compose-serialization.js"), "utf8"), context);
   vm.runInContext(fs.readFileSync(path.join(__dirname, "../app/src/renderer/generate.js"), "utf8"), context);
   return { modules, render: window.renderComposeYaml };
 }
@@ -52,4 +53,20 @@ test("Ollama model names cannot inject shell commands or CLI options", () => {
   const output = ollama.buildCompose({ models: model }, { projectName: "test" });
   assert.ok(output.services[0].command[2].includes("ollama pull 'llama'\\''; touch /tmp/injected; echo '\\'''"));
   assert.throws(() => ollama.buildCompose({ models: "--insecure" }, { projectName: "test" }));
+});
+
+test("Compose build paths, runtime env/entrypoint and dollar literals survive YAML serialization", () => {
+  const { render } = load();
+  const yaml = render({ services: [{ name: "app", build: { context: "./laravel", dockerfile: "Dockerfile.laravel" },
+    working_dir: "/app", env_file: ["./laravel/.env"], entrypoint: [], command: ["sh", "-c", 'echo "${APP_ID}"'],
+    environment: { PASSWORD: "$literal" } }], volumes: new Set() });
+  assert.doesNotMatch(yaml, /image:/);
+  assert.match(yaml, /context: "\.\/laravel"/);
+  assert.match(yaml, /dockerfile: "Dockerfile.laravel"/);
+  assert.match(yaml, /entrypoint: \[\]/);
+  assert.match(yaml, /\$\$\{APP_ID\}/);
+  assert.match(yaml, /PASSWORD=\$\$literal/);
+  const parsed = require("js-yaml").load(yaml);
+  assert.equal(parsed.services.app.working_dir, "/app");
+  assert.equal(parsed.services.app.env_file[0], "./laravel/.env");
 });

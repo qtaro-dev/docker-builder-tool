@@ -5,7 +5,7 @@ registerModule({
   id: "laravel",
   label: "Laravel アプリ",
   description:
-    "Bitnami の Laravel イメージを利用した Web アプリコンテナを追加します。MySQL / MariaDB / PostgreSQL などの DB モジュールと組み合わせて利用してください（DB 必須）。",
+    "PHP公式CLIイメージとLaravel開発サーバー（HTTP 8000）を利用します。Laravelソース、Composer lock、APP_KEYの設定とDBモジュールが必要です。本番公開用ではありません。",
 
   iconPath: "src/modules/laravel_app.png",
   category: "app",
@@ -130,7 +130,9 @@ registerModule({
 
 	  const service = {
       name: serviceName,
-      image: "bitnami/laravel:latest",
+      image: "php:8.4-cli-bookworm",
+      working_dir: "/app",
+      command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"],
       restart: "always",
       ports: [portMapping],
 	    volumes: appMounts,
@@ -153,25 +155,9 @@ registerModule({
 	  };
   },
 
-  buildDockerfile(config = {}, shared = {}) {
-    // Laravel 用の最小テンプレート（必要に応じて調整）
-    return `
-FROM php:8.2-fpm-alpine
-
-# system deps
-RUN apk add --no-cache bash git unzip icu-dev oniguruma-dev libzip-dev \
-  && docker-php-ext-install pdo_mysql intl mbstring zip opcache
-
-# composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-WORKDIR /app
-
-# ここで composer install / 設定コピーなどを追加してください
-# COPY . /app
-# RUN composer install --no-dev --prefer-dist --no-interaction
-
-CMD ["php-fpm"]
-    `.trim();
+  buildDockerfile(config = {}) {
+    // FROMと依存インストールは共通生成処理に集約する。
+    if (!config.imageVersion) return "";
+    return window.ProjectGeneration.dockerfile("laravel", config, config.imageVersion, config.composerVersion);
   },
 });

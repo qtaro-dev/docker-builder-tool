@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  "apache-nodejs-mysql-mysql":
+    image: "mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69"
+    restart: "always"
+    ports:
+      - "13306:3306"
+    volumes:
+      - "apache-nodejs-mysql-mysql-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+  "apache-nodejs-mysql-apache":
+    image: "httpd:2.4.69-alpine@sha256:070da7661f0be8a05430b2c125c0cde9e53176b4048c813024021969a0e3893c"
+    restart: "always"
+    ports:
+      - "18082:80"
+    volumes:
+      - "./fixture-web:/usr/local/apache2/htdocs/"
+  "apache-nodejs-mysql-nodejs":
+    build:
+      context: "./nodejs"
+      dockerfile: "Dockerfile.nodejs"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "13000:3000"
+    command: ["sh","-c","npm run dev"]
+volumes:
+  "apache-nodejs-mysql-mysql-data":

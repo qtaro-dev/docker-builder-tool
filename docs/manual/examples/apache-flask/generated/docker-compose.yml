@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  "apache-flask-apache":
+    image: "httpd:2.4.69-alpine@sha256:070da7661f0be8a05430b2c125c0cde9e53176b4048c813024021969a0e3893c"
+    restart: "always"
+    ports:
+      - "18082:80"
+    volumes:
+      - "./fixture-web:/usr/local/apache2/htdocs/"
+  "apache-flask-flask":
+    build:
+      context: "./python-web"
+      dockerfile: "Dockerfile.python-web"
+    working_dir: "/app"
+    restart: "always"
+    ports:
+      - "15000:5000"
+    volumes:
+      - "./python-web:/app"
+    environment:
+      - "FRAMEWORK=flask"
+    command: ["sh","-c","flask run --host=0.0.0.0 --port=5000"]

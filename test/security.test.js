@@ -48,7 +48,11 @@ test("preload exposes only named operations and strips Electron event objects", 
   assert.equal(api.send, undefined);
   await api.getSettings();
   await api.saveSettings({ theme: "dark" });
-  assert.deepEqual(calls, [["settings:get"], ["settings:save", { theme: "dark" }]]);
+  // 初期化APIは呼び出し元からパスを受け取らず、固定操作だけを公開する。
+  await api.initializeProjectPaths("C:\\outside");
+  await api.getImageCatalog();
+  await api.updateImageCatalog("https://evil.invalid");
+  assert.deepEqual(calls, [["settings:get"], ["settings:save", { theme: "dark" }], ["settings:initializeProjectPaths"], ["images:get"], ["images:update"]]);
   let args;
   const unsubscribe = api.onMenuCommand((...values) => { args = values; });
   listener({ sender: "privileged" }, "file-new");

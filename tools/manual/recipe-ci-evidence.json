@@ -1,0 +1,50 @@
+{
+  "runUrl": "https://github.com/qtaro-dev/docker-builder-tool/actions/runs/40524380569",
+  "event": "workflow_dispatch",
+  "sourceRevision": "50d2e76095a6330783c817101635376d5bb89070",
+  "conclusion": "success",
+  "artifacts": [
+    {
+      "name": "recipe-batch-5",
+      "id": 12744856301,
+      "size": 121349,
+      "sha256": "sha256:d188397bb88cdb937c91584688464f6563cd186a59782090b224d5824e56ed9d"
+    },
+    {
+      "name": "recipe-batch-2",
+      "id": 12744425447,
+      "size": 39974,
+      "sha256": "sha256:c2641dc916263e4bb25228f4831c3ac601d26f8fc37b693ab6ab5b83bd552e8c"
+    },
+    {
+      "name": "recipe-batch-6",
+      "id": 12744403421,
+      "size": 68923,
+      "sha256": "sha256:ddb994cbb2b2e0e30ee935a995b16398bbc20ff8cf4238baef0a6a340cbffc14"
+    },
+    {
+      "name": "manual-recipe-checklist",
+      "id": 12744293536,
+      "size": 4182,
+      "sha256": "sha256:978af4fe915bdffab9ab172eb788517c36002688b9858e0f974a3e965b8c484f"
+    },
+    {
+      "name": "recipe-batch-3",
+      "id": 12744061496,
+      "size": 69826,
+      "sha256": "sha256:262c079c630c13c64e37f8c54dc71128968943f006e452ee09a91c4df76515e1"
+    },
+    {
+      "name": "recipe-batch-1",
+      "id": 12743177649,
+      "size": 38285,
+      "sha256": "sha256:811a6df54b4e92419ecc488c69753a6236599e5da70432f2f4402f3209ae6dc3"
+    },
+    {
+      "name": "recipe-batch-4",
+      "id": 12742848988,
+      "size": 115860,
+      "sha256": "sha256:de8e4a08fe8a0873cbbd0572f1032fe7db1663b958669bfd0b2cb3edd82c57d6"
+    }
+  ]
+}

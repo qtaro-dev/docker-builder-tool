@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  "mariadb-basic-mariadb":
+    image: "mariadb:11.4.13@sha256:250e1609e93c0e6aecf64bfbab2d84d5e89d2481540fe77447ff6c855c3b1873"
+    restart: "always"
+    ports:
+      - "13307:3306"
+    volumes:
+      - "mariadb-basic-mariadb-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+volumes:
+  "mariadb-basic-mariadb-data":

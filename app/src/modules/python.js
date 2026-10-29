@@ -69,8 +69,8 @@ registerModule({
       name: "startCommand",
       label: "起動コマンド",
       type: "text",
-      default: "python app.py",
-      placeholder: "python app.py",
+      default: "",
+      placeholder: "未指定時は選択したDjango / Flaskの開発サーバーを起動",
     },
   ],
 
@@ -148,41 +148,9 @@ registerModule({
   /**
    * Dockerfile（Web 用）を生成
    */
-  buildDockerfile(config, ctx) {
-    const fw = (config.framework || "django").toLowerCase() === "flask"
-      ? "flask"
-      : "django";
-
-    // ベースとなる起動コマンド（compose と合わせる）
-    let command = (config.startCommand || "").trim();
-    if (!command) {
-      const port = fw === "flask" ? 5000 : 8000;
-      if (fw === "flask") {
-        command = `flask run --host=0.0.0.0 --port=${port}`;
-      } else {
-        command = `python manage.py runserver 0.0.0.0:${port}`;
-      }
-    }
-
-    const frameworkLabel = fw === "django" ? "Django" : "Flask";
-
-    return [
-      `# Framework: ${frameworkLabel}`,
-      "FROM python:3.12-slim",
-      "WORKDIR /app",
-      "",
-      "# 必要に応じて requirements.txt を用意し、以下を有効化してください。",
-      "# COPY requirements.txt ./",
-      "# RUN pip install --no-cache-dir -r requirements.txt",
-      "",
-      "# アプリケーションコードをコピー",
-      "COPY . /app",
-      "",
-      `# フレームワーク種別を環境変数として渡します（任意で利用可能）。`,
-      `ENV FRAMEWORK=${fw}`,
-      "",
-      `CMD ${JSON.stringify(command.split(" "))}`,
-      "",
-    ].join("\n");
+  buildDockerfile(config = {}) {
+    // FROMと依存インストールは共通生成処理に集約する。
+    if (!config.imageVersion) return "";
+    return window.ProjectGeneration.dockerfile("python-web", config, config.imageVersion, config.composerVersion);
   },
 });

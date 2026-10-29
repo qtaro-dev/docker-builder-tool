@@ -134,11 +134,9 @@ const service = {
     };
   },
 
-  buildDockerfile(config = {}, shared = {}) {
-    return `
-FROM jenkins/jenkins:lts-jdk17
-
-# 必要に応じてプラグインや初期設定を追加してください。
-    `.trim();
+  buildDockerfile(config = {}) {
+    // FROMと依存インストールは共通生成処理に集約する。
+    if (!config.imageVersion) return "";
+    return window.ProjectGeneration.dockerfile("jenkins", config, config.imageVersion, config.composerVersion);
   },
 });

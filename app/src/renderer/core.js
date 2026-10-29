@@ -37,6 +37,37 @@ function getCurrentProjectName() {
 // [C04] END
 
 // ==============================
+// [C05] テーマの共通反映（保存は呼び出し側で明示的に行う）
+// ==============================
+const themes = [
+  ["system", "自動", "🖥"], ["light", "ライト", "☀"], ["dark", "ダーク", "🌙"],
+  ["blue", "青", "🔵"], ["green", "緑", "🟢"], ["yellow", "黄", "🟡"],
+  ["orange", "オレンジ", "🟠"], ["red", "赤", "🔴"], ["pink", "ピンク", "🌸"],
+];
+let currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+const systemThemeQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+function getTheme() { return currentTheme; }
+function getSystemTheme() { return systemThemeQuery?.matches ? "dark" : "light"; }
+function getEffectiveTheme() {
+  return currentTheme === "system" ? getSystemTheme() : currentTheme;
+}
+function applyTheme(theme) {
+  // warm/cool は旧設定との互換用。選択カードには既存の9テーマだけを表示する。
+  if (!themes.some(([id]) => id === theme) && !["warm", "cool"].includes(theme)) return;
+  currentTheme = theme;
+  document.documentElement.setAttribute("data-theme", getEffectiveTheme());
+  const button = document.getElementById("themeToggleButton");
+  const definition = themes.find(([id]) => id === theme);
+  if (button) button.textContent = definition ? `${definition[2]} ${definition[1]}` : "テーマ";
+  window.dispatchEvent(new CustomEvent("theme-change", { detail: { theme, effectiveTheme: getEffectiveTheme() } }));
+}
+// 「自動」という設定値を保ち、OSの変更時には配色だけを追従させる。
+systemThemeQuery?.addEventListener("change", () => {
+  if (currentTheme === "system") applyTheme("system");
+});
+// [C05] END
+
+// ==============================
 // [C99] グローバル公開（他モジュールから参照）
 // ==============================
 /**
@@ -49,6 +80,11 @@ window.__rendererCore = {
   appendLog,
   sanitizeName,
   getCurrentProjectName,
+  themes,
+  getTheme,
+  getSystemTheme,
+  getEffectiveTheme,
+  applyTheme,
 };
 
 // 互換：既存コードが直接参照していた場合に備えて公開

@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-redis",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.cjs"
+  },
+  "dependencies": {
+    "redis": "6.3.0"
+  }
+}

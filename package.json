@@ -1,13 +1,18 @@
 {
   "name": "docker-builder",
-  "version": "0.2.2",
+  "version": "0.3.0",
+  "release": {
+    "number": 1
+  },
   "description": "Electron desktop tool for generating Docker Compose configurations",
   "main": "main.js",
   "scripts": {
     "test": "node --test test/*.test.js",
     "start": "electron .",
     "test:electron": "node test/run-electron.js",
-    "build:win": "electron-builder --win nsis --x64 --publish never",
+    "test:docker": "node scripts/docker-validation.cjs --run",
+    "test:docker:generate": "node scripts/docker-validation.cjs --generate-only",
+    "build:win": "electron-builder --win nsis portable --x64 --publish never",
     "verify:package": "node scripts/verify-package.cjs"
   },
   "keywords": [],
@@ -31,10 +36,40 @@
       "main.js",
       "preload.js",
       "security.js",
+      "image-catalog.js",
+      "app-info.js",
+      "app-paths.js",
+      "user-manual.js",
       "package.json",
       "app/**/*",
       "!**/*.log",
-      "!**/.env*"
+      "!**/.env*",
+      "!**/Thumbs.db",
+      "!**/desktop.ini",
+      "!**/.DS_Store"
+    ],
+    "extraResources": [
+      {
+        "from": "docs/manual",
+        "to": "manual",
+        "filter": [
+          "index.html",
+          "recipes.html",
+          "manual.css",
+          "manual.js",
+          "art/**/*.png",
+          "images/**/*.png",
+          "icons/**/*.png",
+          "examples/**/*",
+          "!**/*.log",
+          "!**/Thumbs.db",
+          "!**/desktop.ini",
+          "!**/.DS_Store",
+          "!**/.env",
+          "!**/node_modules/**",
+          "!**/vendor/**"
+        ]
+      }
     ],
     "win": {
       "target": [
@@ -43,20 +78,28 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
         }
       ],
-      "artifactName": "Docker.Builder.Tool.Setup.${version}.${arch}.${ext}",
       "signAndEditExecutable": true,
       "signExecutable": false
     },
     "nsis": {
+      "artifactName": "Docker.Builder.Tool.${version}.Installer.${arch}.${ext}",
       "oneClick": false,
       "perMachine": false,
       "allowElevation": false,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": false,
       "createDesktopShortcut": false,
+      "createStartMenuShortcut": true,
       "packElevateHelper": false
+    },
+    "portable": {
+      "artifactName": "Docker.Builder.Tool.${version}.Portable.${arch}.${ext}"
     },
     "publish": null
   }

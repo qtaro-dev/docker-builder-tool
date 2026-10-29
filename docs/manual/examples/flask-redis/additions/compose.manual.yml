@@ -1,0 +1,4 @@
+services:
+  flask-redis-flask:
+    environment:
+      REDIS_URL: redis://flask-redis-redis:6379

@@ -1,0 +1,7 @@
+# Laravel recipe CI fixture
+
+アプリの生成物ではない検証専用の最小Laravelです。Laravel 12.70.1をComposerで使用し、HTTP正常応答と、Laravel経由のMySQL/PostgreSQLへの一時テーブル書込・読出しを検証します。
+
+runnerは生成されたLaravel DockerfileのComposerイメージで依存を準備します。固定フレームワークから解決したcomposer.lockと依存一覧はArtifactへ保存します。利用者が依存を配置するという既存仕様に従い、bind mountで隠れるvendorもホスト側へ準備します。生成Compose/Dockerfileは変更しません。
+
+APP_KEYおよびDB認証値は公開可能なテスト用ダミーです。実サービスへ転用しないでください。Laravel本体と依存のライセンスは各パッケージに従います。

@@ -13,6 +13,7 @@ registerModule({
 
   // 構成入力フィールド
   fields: [
+    ...window.ProjectGeneration.webFields(),
     {
       name: "hostPort",
       label: "公開ポート（ホスト側）",

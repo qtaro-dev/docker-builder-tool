@@ -1,0 +1,7 @@
+{
+  "name": "docker-builder-ci-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CI build fixture only; not an application generated for users",
+  "scripts": { "dev": "node server.cjs" }
+}

@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  "wordpress-mysql-mysql":
+    image: "mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69"
+    restart: "always"
+    ports:
+      - "13306:3306"
+    volumes:
+      - "wordpress-mysql-mysql-data:/var/lib/mysql"
+    environment:
+      - "MYSQL_DATABASE=appdb"
+      - "MYSQL_USER=appuser"
+      - "MYSQL_PASSWORD=demo-recipe-only-42"
+      - "MYSQL_ROOT_PASSWORD=demo-recipe-only-42"
+  "wordpress-mysql-wordpress":
+    image: "wordpress:7.1.3-php8.4-apache@sha256:edbfa4a140f7c5950435f5737538ad83d25af4661b74b990d7ec1eff3bec99a8"
+    restart: "always"
+    ports:
+      - "18090:80"
+    volumes:
+      - "wordpress-mysql-wordpress-data:/var/www/html"
+    environment:
+      - "WORDPRESS_DB_HOST=wordpress-mysql-mysql"
+      - "WORDPRESS_DB_NAME=appdb"
+      - "WORDPRESS_DB_USER=appuser"
+      - "WORDPRESS_DB_PASSWORD=demo-recipe-only-42"
+    depends_on:
+      - "wordpress-mysql-mysql"
+volumes:
+  "wordpress-mysql-mysql-data":
+  "wordpress-mysql-wordpress-data":

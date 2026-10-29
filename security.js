@@ -47,4 +47,19 @@ function assertTrustedSender(event, window) {
   }
 }
 
-module.exports = { entryURL, text, record, validateSettings, assertTrustedSender };
+// 保存先はネイティブダイアログで選んだ新規フォルダ内に限定する。
+function validateGeneratedFiles(files) {
+  if (!Array.isArray(files) || files.length < 1 || files.length > 200) throw new TypeError("Invalid file list");
+  const seen = new Set(); let total = 0;
+  return files.map(file => {
+    record(file);
+    const relativePath = text(file.relativePath, 400), content = text(file.content, 2 * 1024 * 1024);
+    const segments = relativePath.split('/');
+    if (segments.some(p => !/^[a-zA-Z0-9_-][a-zA-Z0-9_.-]*$/.test(p) || /[.]$/.test(p) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p)) ||
+        !/^(?:docker-compose\.yml|index\.html|setting\.html|default\.conf|httpd-support\.conf|Dockerfile\.[a-z0-9-]+(?:\.dockerignore)?)$/.test(segments.at(-1)) || seen.has(relativePath.toLowerCase())) throw new TypeError("Invalid generated path");
+    seen.add(relativePath.toLowerCase()); total += Buffer.byteLength(content);
+    if (total > 8 * 1024 * 1024) throw new TypeError("Generated files too large");
+    return {relativePath, content};
+  });
+}
+module.exports = { entryURL, text, record, validateSettings, assertTrustedSender, validateGeneratedFiles };
