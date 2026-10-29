@@ -7,9 +7,8 @@ const asar = require('@electron/asar');
 
 test('About illustration stays byte-identical and its relative resource survives ASAR packaging', async () => {
   const root = path.resolve(__dirname, '..');
-  const original = fs.readFileSync(path.join(root, 'image', 'AIペンギンと Docker クジラの大冒険.png'));
   const resource = fs.readFileSync(path.join(root, 'app/assets/about-penguin-whale.png'));
-  assert.deepEqual(resource, original, 'Do not process the supplied illustration');
+  assert.equal(require('node:crypto').createHash('sha256').update(resource).digest('hex'), '1690b43494ef7d3376065a176a4a30c869cb607d40d2373c82f8f08dbd3f0fa8', 'Do not process the supplied illustration');
   const manifest = require('../package.json');
   assert.ok(manifest.build.files.includes('app/**/*'), 'Illustration must use the packaged runtime subtree');
   const scratchRoot = fs.realpathSync(os.tmpdir());
@@ -20,7 +19,7 @@ test('About illustration stays byte-identical and its relative resource survives
     const html = asar.extractFile(archive, 'index.html').toString('utf8');
     const imagePath = html.match(/class="about-illustration" src="([^"]+)"/)[1];
     assert.equal(imagePath, './assets/about-penguin-whale.png');
-    assert.deepEqual(asar.extractFile(archive, path.normalize(imagePath)), original);
+    assert.deepEqual(asar.extractFile(archive, path.normalize(imagePath)), resource);
   } finally {
     assert.equal(path.dirname(scratch), scratchRoot);
     fs.rmSync(scratch, { recursive: true, force: true });

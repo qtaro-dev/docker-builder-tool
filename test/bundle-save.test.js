@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const {saveBundle,projectFolderName}=require('../app/bundle-save');
 const {generateCase}=require('../scripts/lib/headless-generation.cjs');
 const {renderComposeYaml}=require('../app/src/compose-serialization');
-async function temporary(fn){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'dbt-bundle-'));try{await fn(dir);}finally{assert.equal(path.dirname(path.resolve(dir)),path.resolve(os.tmpdir()));fs.rmSync(dir,{recursive:true,force:true});}}
+async function temporary(fn){const base=fs.realpathSync.native(os.tmpdir());const dir=fs.mkdtempSync(path.join(base,'dbt-bundle-'));try{await fn(dir);}finally{assert.equal(path.dirname(path.resolve(dir)),base);fs.rmSync(dir,{recursive:true,force:true});}}
 const basic=[{relativePath:'docker-compose.yml',content:'new compose'},{relativePath:'nginx/conf/default.conf',content:'new conf'},{relativePath:'nginx/html/index.html',content:'new html'}];
 const reject=()=>{throw new Error('Unexpected confirmation');};
 test('bundle uses myapp and retains generated Nginx/Node files and Compose references',()=>temporary(async parent=>{
